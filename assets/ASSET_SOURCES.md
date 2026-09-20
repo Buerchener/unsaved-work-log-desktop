@@ -37,6 +37,10 @@ Use case: photorealistic-natural. Generate one landscape 3:2 photograph, a quiet
 
 ## 消息通知音
 
+当前使用 `windows-xp-notify.wav`：Windows XP Notify 经典通知音，原 WAV 文件直接保存。素材档案页：https://lelegofrog.github.io/winwavxp.html ，下载：https://lelegofrog.github.io/lelegodlex/win/xp/Windows%20XP%20Notify.wav 。声音归原权利方所有，档案站收录不代表开放许可。本项目未将其声明为原创。
+
+以下微信音效保留为旧素材，已不用于消息播放：
+
 `wechat-notification.mp3`：第三方音效站标注的 WeChat notification 音效，约 2.18 秒。来源：https://tiengdong.com/am-thanh-thong-bao-wechat 。下载原链接：https://tiengdong.com/wp-content/uploads/am-thanh-thong-bao-wechat-www_tiengdong_com.mp3 。去掉内嵌封面和元数据，音轨未重编码。不是本项目原创或腾讯官方授权声明。
 
 播放音量为 45%，默认开启；快速设置中可以关闭或试听。旧版存档首次载入本次更新时启用一次，此后手动静音会保留。只在新通知横幅展示时触发，当前会话不额外响铃。连续通知不叠音，静音立刻停止提示音。保存的开启偏好在刷新后通过第一次用户点击或键盘操作恢复播放能力，不追播历史通知。
