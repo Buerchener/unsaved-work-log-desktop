@@ -39,4 +39,4 @@ Use case: photorealistic-natural. Generate one landscape 3:2 photograph, a quiet
 
 `wechat-notification.mp3`：第三方音效站标注的 WeChat notification 音效，约 2.18 秒。来源：https://tiengdong.com/am-thanh-thong-bao-wechat 。下载原链接：https://tiengdong.com/wp-content/uploads/am-thanh-thong-bao-wechat-www_tiengdong_com.mp3 。去掉内嵌封面和元数据，音轨未重编码。不是本项目原创或腾讯官方授权声明。
 
-播放音量为 45%，默认关闭；快速设置中可以开启或试听。只在新通知横幅展示时触发，当前会话不额外响铃。连续通知不叠音，静音立刻停止提示音。保存的开启偏好在刷新后通过第一次用户点击或键盘操作恢复播放能力，不追播历史通知。
+播放音量为 45%，默认开启；快速设置中可以关闭或试听。旧版存档首次载入本次更新时启用一次，此后手动静音会保留。只在新通知横幅展示时触发，当前会话不额外响铃。连续通知不叠音，静音立刻停止提示音。保存的开启偏好在刷新后通过第一次用户点击或键盘操作恢复播放能力，不追播历史通知。

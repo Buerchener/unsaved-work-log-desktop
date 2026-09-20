@@ -18,7 +18,7 @@ const Desktop=(()=>{
  icons.minimize='<path d="M5 16h14"/>';
  icons.restore='<path d="M8 8V4h12v12h-4"/><rect x="4" y="8" width="12" height="12" rx="1"/>';
  let activeBanners=new Map(),notificationJob=null,introTimer=null,observer=null,drag=null,selected=null;
- const defaults=()=>({wallpaper:'bloom-light.jpg',windows:[],front:null,z:10,officeTab:'work',conversation:'ayuan',sound:false,notes:'周末想做的事\n\n给植物换个盆。\n补完湖边那张画。\n读完《看不见的城市》。\n\n阿远说新开的球场灯不错，下次去试试。',noteDraft:null,album:0,folder:'home',game:{cards:['leaf','ball','moon','music','ball','leaf','music','moon'],open:[],matched:[],moves:0},track:0});
+ const defaults=()=>({wallpaper:'bloom-light.jpg',windows:[],front:null,z:10,officeTab:'work',conversation:'ayuan',sound:true,soundDefaultVersion:1,notes:'周末想做的事\n\n给植物换个盆。\n补完湖边那张画。\n读完《看不见的城市》。\n\n阿远说新开的球场灯不错，下次去试试。',noteDraft:null,album:0,folder:'home',game:{cards:['leaf','ball','moon','music','ball','leaf','music','moon'],open:[],matched:[],moves:0},track:0});
  function comp(){return state.computer;}
  function win(id){return comp().windows.find(w=>w.id===id);}
  function badge(id){return id==='office'?unread('work'):id==='chat'?unread('personal'):0;}
@@ -134,10 +134,12 @@ const Desktop=(()=>{
   const description=!resumed?'主管的工作消息会出现在右下角。点击通知，或打开“协作空间”查看。':state.stage==='tuesday'?'第一天已经结束。昨天的聊天、日历和工作记录都还在。':state.stage==='night'?'今晚的安排已经完成。可以查看后续消息，或从开始菜单的电源入口合上电脑休息。':evening?'今天的常规工作已完成，晚间安排还未执行。主管和阿远的消息保留在各自的应用里。':`已完成 ${state.completed.length} / 4 项常规工作。可以回到主管会话继续处理。`;
   const label=state.stage==='tuesday'?'回看工作消息':state.stage==='night'?'查看晚间消息':evening?(state.overtimeReply==='accepted'?'继续处理汇总表':'查看阿远的消息'):'查看主管消息';
   const el=document.createElement('aside');el.id='entry-guide';el.setAttribute('aria-label',resumed?'继续上次体验':'开始使用电脑');
-  el.innerHTML=`<button class="entry-close" data-desktop="entry-close" aria-label="收起入口提示">${icon('close')}</button><strong>${title}</strong><p>${description}</p><div class="entry-actions"><button class="btn primary" data-desktop="entry-continue">${label}</button>${resumed?'<button class="btn" data-desktop="entry-restart">从周一早晨重新开始</button>':'<button class="btn" data-desktop="entry-sound">开启消息声音</button>'}</div><small>${resumed?'旧消息不会重复弹出；可在右下角通知中心回看。':'桌面图标双击打开，任务栏单击打开。声音默认关闭。'}</small>`;
+  el.innerHTML=`<button class="entry-close" data-desktop="entry-close" aria-label="收起入口提示">${icon('close')}</button><strong>${title}</strong><p>${description}</p><div class="entry-actions"><button class="btn primary" data-desktop="entry-continue">${label}</button>${resumed?'<button class="btn" data-desktop="entry-restart">从周一早晨重新开始</button>':'<button class="btn" data-desktop="entry-sound">试听消息声音</button>'}</div><small>${resumed?'旧消息不会重复弹出；可在右下角通知中心回看。':'桌面图标双击打开，任务栏单击打开。消息声音默认开启，首次点击后生效。'}</small>`;
   document.getElementById('desktop').append(el);
  }
  function init(){
+  // Apply the new default once to old saves; later mute choices stay saved.
+  if(state.computer&&state.computer.soundDefaultVersion!==1){state.computer.sound=true;state.computer.soundDefaultVersion=1;}
   state.computer={...defaults(),...(state.computer||{})};state.computer.windows=state.computer.windows.filter(w=>apps[w.app]||w.app==='document');
   state.notifications||=[];for(const m of [...state.workMessages,...state.privateMessages])if(typeof m.read!=='boolean')m.read=m.side==='me';
   if(!state.notifications.length&&state.openingShown){for(const channel of ['work','personal'])for(const m of channel==='work'?state.workMessages:state.privateMessages)if(m.side==='them')state.notifications.push({id:m.id,channel,text:m.text,time:m.time,shown:true,dismissed:true,delivered:true});}
