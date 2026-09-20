@@ -37,7 +37,9 @@ Use case: photorealistic-natural. Generate one landscape 3:2 photograph, a quiet
 
 ## 消息通知音
 
-当前使用 `windows-xp-notify.wav`：Windows XP Notify 经典通知音，原 WAV 文件直接保存。素材档案页：https://lelegofrog.github.io/winwavxp.html ，下载：https://lelegofrog.github.io/lelegodlex/win/xp/Windows%20XP%20Notify.wav 。声音归原权利方所有，档案站收录不代表开放许可。本项目未将其声明为原创。
+当前使用 `windows11-notify.wav`：来自 WinSounds 收录的 Windows 11 build 22000.51 音效包，包内 `sounds/Windows Notify System Generic.wav`，浅色版本，原 WAV 音频直接保存。来源：https://winsounds.com/download-sounds-from-windows-11/ ，原包：https://winsounds.com/wp-content/uploads/2021/07/Windows11_sounds_b22000.zip 。这是第三方系统音效档案，并非本项目原创或微软官方授权声明。
+
+旧版素材（已停用）`windows-xp-notify.wav`：Windows XP Notify 经典通知音，原 WAV 文件直接保存。素材档案页：https://lelegofrog.github.io/winwavxp.html ，下载：https://lelegofrog.github.io/lelegodlex/win/xp/Windows%20XP%20Notify.wav 。声音归原权利方所有，档案站收录不代表开放许可。本项目未将其声明为原创。
 
 以下微信音效保留为旧素材，已不用于消息播放：
 

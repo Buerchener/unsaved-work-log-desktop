@@ -31,7 +31,7 @@ const Leisure=(()=>{
  async function toggle(){if(!player||!player.src.endsWith(tracks[c().track][0])){player?.pause();player=new Audio('assets/'+tracks[c().track][0]);player.addEventListener('timeupdate',()=>{const p=document.querySelector('.music-progress');if(p)p.value=player.currentTime;});player.addEventListener('ended',()=>redraw('music'));}if(player.paused){try{await player.play();}catch(e){toast('音频暂时无法播放，请重试。');}}else player.pause();redraw('music');}
  function pause(){player?.pause();}
  function notificationPlayer(){
-  if(!notificationAudio){notificationAudio=new Audio('assets/windows-xp-notify.wav');notificationAudio.preload='auto';notificationAudio.volume=.45;notificationAudio.dataset.notificationAudio='true';notificationAudio.hidden=true;document.body.append(notificationAudio);}
+  if(!notificationAudio){notificationAudio=new Audio('assets/windows11-notify.wav');notificationAudio.preload='auto';notificationAudio.volume=.45;notificationAudio.dataset.notificationAudio='true';notificationAudio.hidden=true;document.body.append(notificationAudio);}
   return notificationAudio;
  }
  function unlock(preview=false){notificationReady=true;notificationPlayer();if(preview)chime(true);}
