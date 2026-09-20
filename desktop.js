@@ -30,7 +30,7 @@ const Desktop=(()=>{
   w.x=Math.max(0,Math.min(w.x,aw-w.w));w.y=Math.max(0,Math.min(w.y,ah-w.h));return w;
  }
  function applyWindow(w){const el=document.querySelector(`[data-window="${w.id}"]`);if(!el)return;const r=bounds(w);el.style.left=r.x+'px';el.style.top=r.y+'px';el.style.width=r.w+'px';el.style.height=r.h+'px';el.style.zIndex=w.z;el.hidden=w.min;el.classList.toggle('foreground',comp().front===w.id);el.classList.toggle('maximized',w.max);if(innerWidth<700)el.hidden=w.min||comp().front!==w.id;const b=el.querySelector('[data-wm="maximize"]');b.innerHTML=icon(w.max?'restore':'maximize');b.setAttribute('aria-label',w.max?'还原窗口':'最大化窗口');}
- function focus(id,keyboard=false){const w=win(id);if(!w)return;w.min=false;w.z=++comp().z;comp().front=id;for(const item of comp().windows)applyWindow(item);chrome();persist();if(keyboard)document.querySelector(`[data-window="${id}"] .window-titlebar`).focus({preventScroll:true});requestAnimationFrame(readVisible);}
+ function focus(id,keyboard=false){const w=win(id);if(!w)return;if(['office','chat','document','email'].includes(w.app))hideEntry();w.min=false;w.z=++comp().z;comp().front=id;for(const item of comp().windows)applyWindow(item);chrome();persist();if(keyboard)document.querySelector(`[data-window="${id}"] .window-titlebar`).focus({preventScroll:true});requestAnimationFrame(readVisible);}
  function create(id,app,data={}){let w=win(id);if(w){focus(id);return w;}const a=apps[app]||{w:860,h:630};const n=comp().windows.length;w={id,app,x:150+(n%5)*34,y:64+(n%5)*27,w:a.w,h:a.h,z:++comp().z,min:false,max:false,data};comp().windows.push(w);mount(w);focus(id,true);return w;}
  function mount(w){const el=document.createElement('section');el.className='app-window';el.dataset.window=w.id;el.dataset.app=w.app;el.setAttribute('aria-label',title(w));el.innerHTML=`<header class="window-titlebar" tabindex="-1">${appIcon(w.app)}<span class="window-name">${escapeHTML(title(w))}</span><div class="window-controls"><button data-wm="minimize" aria-label="最小化窗口">${icon('minimize')}</button><button data-wm="maximize" aria-label="最大化窗口">${icon('maximize')}</button><button data-wm="close" aria-label="关闭窗口">${icon('close')}</button></div></header><div class="window-content app-surface"></div><button class="resize-handle" data-wm="resize" aria-label="调整窗口大小（方向键微调）"></button>`;document.getElementById('windows').append(el);renderWindow(w);applyWindow(w);}
  function title(w){return w.app==='document'?(w.data.task==='overtime'?'明早汇总表.xlsx':tasks.find(t=>t.id===w.data.task)?.file||'文档'):apps[w.app].name;}
@@ -117,13 +117,25 @@ const Desktop=(()=>{
  }
  function dismiss(id){const entry=activeBanners.get(id);if(entry){clearTimeout(entry.timer);entry.el.remove();activeBanners.delete(id);}const n=state.notifications.find(n=>n.id===id);if(n){n.dismissed=true;persist();}scheduleNotifications();}
  function openNotification(id){const n=state.notifications.find(n=>n.id===id);if(!n)return;dismiss(id);if(n.channel==='personal'){comp().conversation='ayuan';openApp('chat');scrollChat('chat',id);}else{comp().officeTab='work';openApp('office');scrollChat('office',id);}document.getElementById('notification-center').hidden=true;}
+ function hideEntry(){document.getElementById('entry-guide')?.remove();}
+ function entryGuide(){
+  hideEntry();
+  const resumed=state.openingShown||state.completed.length>0||state.stage!=='day';
+  const evening=state.stage==='day'&&state.completed.length===4;
+  const title=resumed?`已恢复上次进度 · ${state.stage==='tuesday'?'周二':'周一'} ${state.clock}`:'周一早晨 · 09:00';
+  const description=!resumed?'主管的工作消息会出现在右下角。点击通知，或打开“协作空间”查看。':state.stage==='tuesday'?'第一天已经结束。昨天的聊天、日历和工作记录都还在。':state.stage==='night'?'今晚的安排已经完成。可以查看后续消息，或从开始菜单的电源入口合上电脑休息。':evening?'今天的常规工作已完成，晚间安排还未执行。主管和阿远的消息保留在各自的应用里。':`已完成 ${state.completed.length} / 4 项常规工作。可以回到主管会话继续处理。`;
+  const label=state.stage==='tuesday'?'回看工作消息':state.stage==='night'?'查看晚间消息':evening?(state.overtimeReply==='accepted'?'继续处理汇总表':'查看阿远的消息'):'查看主管消息';
+  const el=document.createElement('aside');el.id='entry-guide';el.setAttribute('aria-label',resumed?'继续上次体验':'开始使用电脑');
+  el.innerHTML=`<button class="entry-close" data-desktop="entry-close" aria-label="收起入口提示">${icon('close')}</button><strong>${title}</strong><p>${description}</p><div class="entry-actions"><button class="btn primary" data-desktop="entry-continue">${label}</button>${resumed?'<button class="btn" data-desktop="entry-restart">从周一早晨重新开始</button>':'<button class="btn" data-desktop="entry-sound">开启消息声音</button>'}</div><small>${resumed?'旧消息不会重复弹出；可在右下角通知中心回看。':'桌面图标双击打开，任务栏单击打开。声音默认关闭。'}</small>`;
+  document.getElementById('desktop').append(el);
+ }
  function init(){
   state.computer={...defaults(),...(state.computer||{})};state.computer.windows=state.computer.windows.filter(w=>apps[w.app]||w.app==='document');
   state.notifications||=[];for(const m of [...state.workMessages,...state.privateMessages])if(typeof m.read!=='boolean')m.read=m.side==='me';
   if(!state.notifications.length&&state.openingShown){for(const channel of ['work','personal'])for(const m of channel==='work'?state.workMessages:state.privateMessages)if(m.side==='them')state.notifications.push({id:m.id,channel,text:m.text,time:m.time,shown:true,dismissed:true,delivered:true});}
   if(!state.openingShown&&!state.notifications.some(n=>n.id==='work-intro')){const m=state.workMessages.find(m=>m.id==='work-intro');state.notifications.push({id:m.id,channel:'work',text:m.text,time:m.time,shown:false,dismissed:false,delivered:true});}
   for(const n of state.notifications)if(n.id==='overtime-offer'&&n.ready===true)n.ready='go';
-  for(const w of comp().windows)mount(w);chrome();persist();
+  for(const w of comp().windows)mount(w);chrome();entryGuide();persist();
   if(!state.openingShown)introTimer=setTimeout(()=>{state.openingShown=true;persist();scheduleNotifications();},1400);else scheduleNotifications();
   if(storageBlocked)setTimeout(()=>toast(loadNotice),800);
   if(state.migrationNotice&&!comp().migrationShown){comp().migrationShown=true;persist();setTimeout(()=>toast('旧进度已保留。详情见电脑菜单中的帮助。'),800);}
@@ -138,6 +150,10 @@ const Desktop=(()=>{
   const no=e.target.closest('[data-notification-open]');if(no){openNotification(no.dataset.notificationOpen);return;}const nd=e.target.closest('[data-notification-dismiss]');if(nd){dismiss(nd.dataset.notificationDismiss);return;}
   const a=e.target.closest('[data-desktop]');if(!a)return;
   switch(a.dataset.desktop){
+   case 'entry-close':hideEntry();break;
+   case 'entry-continue':{hideEntry();if(state.stage==='night')goApp('personal');else if(state.stage==='day'&&state.completed.length===4){if(state.overtimeReply==='accepted')openDocument('overtime');else goApp('personal');}else goApp('work');break;}
+   case 'entry-restart':openModal('reset');break;
+   case 'entry-sound':comp().sound=true;Leisure.unlock(true);persist();a.textContent='消息声音已开启';a.disabled=true;break;
    case 'show-desktop':showDesktop();break;
    case 'notifications':{const c=document.getElementById('notification-center');c.hidden=!c.hidden;renderCenter();break;}
    case 'sound':comp().sound=!comp().sound;if(comp().sound)Leisure.unlock(true);else Leisure.muteNotifications();persist();chrome();break;
