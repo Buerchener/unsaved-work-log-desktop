@@ -2,7 +2,7 @@
 const Leisure=(()=>{
  const albums=[['photos/lakeside.png','周末的湖边','上周日 · 傍晚'],['photos/court.png','灯亮起来的时候','和阿远常去的球场'],['photos/desk.png','靠窗的位置','周末午后 · 家里']];
  const tracks=[['lakeside.wav','湖边散步','原创 · 轻柔合成器'],['windowlight.wav','窗边微光','原创 · 午后钢琴音色']];
- let player=null,context=null;
+ let player=null,notificationAudio=null,notificationReady=false;
  const c=()=>Desktop.comp();
  function html(app){
   if(app==='settings')return WinShell.settings();
@@ -30,7 +30,19 @@ const Leisure=(()=>{
  }
  async function toggle(){if(!player||!player.src.endsWith(tracks[c().track][0])){player?.pause();player=new Audio('assets/'+tracks[c().track][0]);player.addEventListener('timeupdate',()=>{const p=document.querySelector('.music-progress');if(p)p.value=player.currentTime;});player.addEventListener('ended',()=>redraw('music'));}if(player.paused){try{await player.play();}catch(e){toast('音频暂时无法播放，请重试。');}}else player.pause();redraw('music');}
  function pause(){player?.pause();}
- function unlock(){try{context||=new (window.AudioContext||window.webkitAudioContext)();context.resume();}catch(e){}}
- function chime(){if(!context||context.state!=='running')return;const o=context.createOscillator(),g=context.createGain();o.frequency.value=660;g.gain.setValueAtTime(.04,context.currentTime);g.gain.exponentialRampToValueAtTime(.001,context.currentTime+.18);o.connect(g);g.connect(context.destination);o.start();o.stop(context.currentTime+.2);}
- return {html,action,pause,unlock,chime};
+ function notificationPlayer(){
+  if(!notificationAudio){notificationAudio=new Audio('assets/wechat-notification.mp3');notificationAudio.preload='auto';notificationAudio.volume=.45;notificationAudio.dataset.notificationAudio='true';notificationAudio.hidden=true;document.body.append(notificationAudio);}
+  return notificationAudio;
+ }
+ function unlock(preview=false){notificationReady=true;notificationPlayer();if(preview)chime(true);}
+ function chime(preview=false){
+  if(!notificationReady||(!preview&&!Desktop.comp().sound))return;
+  const a=notificationPlayer();if(!preview&&!a.paused)return;
+  a.pause();a.currentTime=0;
+  a.play().catch(()=>{if(preview)toast('声音暂时无法播放，请检查浏览器声音设置后重试。');});
+ }
+ function muteNotifications(){notificationAudio?.pause();if(notificationAudio)notificationAudio.currentTime=0;}
+ document.addEventListener('pointerdown',e=>{if(e.isTrusted&&typeof Desktop!=='undefined'&&Desktop.comp()?.sound)unlock();},{passive:true});
+ document.addEventListener('keydown',e=>{if(e.isTrusted&&typeof Desktop!=='undefined'&&Desktop.comp()?.sound)unlock();});
+ return {html,action,pause,unlock,chime,muteNotifications};
 })();

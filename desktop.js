@@ -128,7 +128,7 @@ const Desktop=(()=>{
   if(storageBlocked)setTimeout(()=>toast(loadNotice),800);
   if(state.migrationNotice&&!comp().migrationShown){comp().migrationShown=true;persist();setTimeout(()=>toast('旧进度已保留。详情见电脑菜单中的帮助。'),800);}
  }
- function newGame(){clearTimeout(introTimer);clearTimeout(notificationJob);for(const v of activeBanners.values())clearTimeout(v.timer);activeBanners.clear();document.getElementById('banners').replaceChildren();document.getElementById('windows').replaceChildren();document.getElementById('shortcuts').replaceChildren();Leisure.pause();state.computer=defaults();init();}
+ function newGame(){Leisure.muteNotifications();clearTimeout(introTimer);clearTimeout(notificationJob);for(const v of activeBanners.values())clearTimeout(v.timer);activeBanners.clear();document.getElementById('banners').replaceChildren();document.getElementById('windows').replaceChildren();document.getElementById('shortcuts').replaceChildren();Leisure.pause();state.computer=defaults();init();}
  document.addEventListener('dblclick',e=>{const shortcut=e.target.closest('[data-launch]');if(shortcut)openApp(shortcut.dataset.launch);const bar=e.target.closest('.window-titlebar');if(bar&&!e.target.closest('button'))toggleMax(bar.closest('[data-window]').dataset.window);});
  function toggleMax(id){const w=win(id);w.max=!w.max;focus(id);applyWindow(w);persist();}
  document.addEventListener('click',e=>{
@@ -140,7 +140,7 @@ const Desktop=(()=>{
   switch(a.dataset.desktop){
    case 'show-desktop':showDesktop();break;
    case 'notifications':{const c=document.getElementById('notification-center');c.hidden=!c.hidden;renderCenter();break;}
-   case 'sound':comp().sound=!comp().sound;if(comp().sound)Leisure.unlock();persist();chrome();break;
+   case 'sound':comp().sound=!comp().sound;if(comp().sound)Leisure.unlock(true);else Leisure.muteNotifications();persist();chrome();break;
    case 'menu':WinShell.toggleStart();break;
    case 'search':WinShell.toggleStart(true);break;
    case 'quick-settings':WinShell.quickSettings();break;

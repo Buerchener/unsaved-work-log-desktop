@@ -34,3 +34,9 @@ Use case: photorealistic-natural. One landscape 3:2 full-frame photograph for th
 ### photos/desk.png
 
 Use case: photorealistic-natural. Generate one landscape 3:2 photograph, a quiet personal smartphone snapshot in an ordinary young adult's small apartment on a weekend. An unpretentious wooden desk beside a window, one small green potted plant, a paperback book with no legible title, an open sketchbook with a faint unfinished pencil landscape, a pencil resting naturally across it, and a simple ceramic cup. Soft afternoon window light, subtle warm wood and muted green, lived-in believable textures, lightly imperfect casual framing viewed diagonally downward from a seated person's position. This is a private memory in a fictional character's photo album, not a luxury interior or staged commercial product photo. No person, no laptop or office branding, no text overlays, no readable typography, no watermark, no vector or painted illustration, no collage, no UI. Full-frame photographic realism.
+
+## 消息通知音
+
+`wechat-notification.mp3`：第三方音效站标注的 WeChat notification 音效，约 2.18 秒。来源：https://tiengdong.com/am-thanh-thong-bao-wechat 。下载原链接：https://tiengdong.com/wp-content/uploads/am-thanh-thong-bao-wechat-www_tiengdong_com.mp3 。去掉内嵌封面和元数据，音轨未重编码。不是本项目原创或腾讯官方授权声明。
+
+播放音量为 45%，默认关闭；快速设置中可以开启或试听。只在新通知横幅展示时触发，当前会话不额外响铃。连续通知不叠音，静音立刻停止提示音。保存的开启偏好在刷新后通过第一次用户点击或键盘操作恢复播放能力，不追播历史通知。
