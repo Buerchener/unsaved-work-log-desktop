@@ -37,7 +37,9 @@ Use case: photorealistic-natural. Generate one landscape 3:2 photograph, a quiet
 
 ## 消息通知音
 
-当前使用 `windows11-notify.wav`：来自 WinSounds 收录的 Windows 11 build 22000.51 音效包，包内 `sounds/Windows Notify System Generic.wav`，浅色版本，原 WAV 音频直接保存。来源：https://winsounds.com/download-sounds-from-windows-11/ ，原包：https://winsounds.com/wp-content/uploads/2021/07/Windows11_sounds_b22000.zip 。这是第三方系统音效档案，并非本项目原创或微软官方授权声明。
+当前使用 `wechat-desktop-notify.wav`：用户在试听页选定的 W01。来自本机 `/Applications/WeChat.app/Contents/Resources/notifyIn.caf`，使用 afconvert 转换为 PCM WAV，0.9 秒、44.1 kHz、双声道。未改音高、速度，播放音量 45%，默认开启，保留主动关闭设置。声音归原权利方所有，不作为本项目原创。
+
+旧版素材（已停用）`windows11-notify.wav`：来自 WinSounds 收录的 Windows 11 build 22000.51 音效包，包内 `sounds/Windows Notify System Generic.wav`，浅色版本，原 WAV 音频直接保存。来源：https://winsounds.com/download-sounds-from-windows-11/ ，原包：https://winsounds.com/wp-content/uploads/2021/07/Windows11_sounds_b22000.zip 。这是第三方系统音效档案，并非本项目原创或微软官方授权声明。
 
 旧版素材（已停用）`windows-xp-notify.wav`：Windows XP Notify 经典通知音，原 WAV 文件直接保存。素材档案页：https://lelegofrog.github.io/winwavxp.html ，下载：https://lelegofrog.github.io/lelegodlex/win/xp/Windows%20XP%20Notify.wav 。声音归原权利方所有，档案站收录不代表开放许可。本项目未将其声明为原创。
 
