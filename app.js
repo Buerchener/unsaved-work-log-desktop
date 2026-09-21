@@ -33,18 +33,18 @@ const icons = {
 function icon(name,extra=''){return `<svg class="icon ${extra}" viewBox="0 0 24 24" aria-hidden="true">${icons[name]||icons.file}</svg>`;}
 function escapeHTML(text){return String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 const tasks=[
- {id:'report',title:'修改报告',desc:'项目报告_v3.docx · 核对两处批注',reward:5,time:'09:30',file:'项目报告_v3.docx',symbol:'file'},
- {id:'email',title:'回复客户邮件',desc:'确认更新内容，并发送报告附件',reward:3,time:'11:10',file:'回复：本周项目进度',symbol:'mail'},
- {id:'archive',title:'整理项目资料',desc:'归档已确认版本，更新共享目录',reward:5,time:'14:30',file:'项目资料 / 本周归档',symbol:'folder'},
- {id:'meeting',title:'确认会议纪要',desc:'核对讨论结果，确认后续安排',reward:7,time:'17:20',file:'周一项目例会 · 会议纪要',symbol:'people'}
+ {id:'report',title:'Revise report',desc:'Project report_v3.docx · Review two comments',reward:5,time:'09:30',file:'Project report_v3.docx',symbol:'file'},
+ {id:'email',title:'Reply to the client email',desc:'Confirm the updates and send the report attachment.',reward:3,time:'11:10',file:'Re: This week’s project update',symbol:'mail'},
+ {id:'archive',title:'Organize project files',desc:'File the approved versions and update the shared folder.',reward:5,time:'14:30',file:'Project files / This week’s archive',symbol:'folder'},
+ {id:'meeting',title:'Confirm meeting notes',desc:'Check the discussion points and confirm the follow-up actions.',reward:7,time:'17:20',file:'Monday project meeting · Meeting notes',symbol:'people'}
 ];
 function freshState(){return {
  version:4,stage:'day',clock:'09:00',app:'work',completed:[],performance:0,life:50,
  friendReply:null,overtimeReply:null,inviteSent:false,overtimeOffered:false,overtimeDone:false,
  activity:null,attended:false,notifiedFriend:false,workDirty:true,savedWorkAt:null,savedEntries:[],lastWorkAt:null,
  mondayPerformance:null,migrationNotice:null,computer:null,notifications:[],openingShown:false,
- workMessages:[{id:'work-intro',side:'them',time:'09:00',text:'早，客户补了两处修改，我已经标在报告里了。午饭前更新一下就行。',attachment:'report'}],
- privateMessages:[{id:'friend-reminder',side:'them',time:'周日 22:14',text:'上回你说这周再打，今晚别忘了啊。'}],
+ workMessages:[{id:'work-intro',side:'them',time:'09:00',text:'Morning. The client sent two changes. I’ve marked them in the report. Could you update it before lunch?',attachment:'report'}],
+ privateMessages:[{id:'friend-reminder',side:'them',time:'Sunday 22:14',text:'You said we’d play this week. Don’t forget tomorrow night!'}],
  read:{work:0,personal:0},events:[],sequence:0
 };}
 let storageAvailable=true,storageBlocked=false,loadNotice='';
@@ -62,13 +62,14 @@ try{
    state.notifiedFriend=parsed.friendReply==='no';
    if(parsed.stage==='tuesday'){state.mondayPerformance=parsed.performance;state.performance=0;}
    const next=tasks[state.completed.length];
-   if(state.stage==='day'&&next&&state.completed.length){state.workMessages.push({id:'migration-next',side:'them',time:state.clock,text:'接着处理这份就好。',attachment:next.id});}
-   state.migrationNotice='已保留并兼容载入上一版进度。原存档仍单独保留；已完成事项和数值没有重新结算。';
+   if(state.stage==='day'&&next&&state.completed.length){state.workMessages.push({id:'migration-next',side:'them',time:state.clock,text:'Please carry on with this file.',attachment:next.id});}
+   state.migrationNotice='Your previous progress has been loaded. The original save is kept separately. Completed tasks and scores have not been counted again.';
   }
-  if(parsed.version!==4){state.version=4;state.computer=null;state.notifications=[];state.openingShown=true;state.migrationNotice='已兼容载入旧进度；原始存档独立保留，没有重新结算。详情可在帮助中查看。';}
+  if(parsed.version!==4){state.version=4;state.computer=null;state.notifications=[];state.openingShown=true;state.migrationNotice='Your older progress has been loaded without recalculating anything. The original save is kept separately. See Help for details.';}
   for(const channel of ['work','personal']){const list=channel==='work'?state.workMessages:state.privateMessages;list.forEach((m,i)=>{if(typeof m.read!=='boolean')m.read=m.side==='me'||i<(state.read[channel]||0);});}
  }
-}catch(_){storageBlocked=true;loadNotice='已有存档暂时无法读取。为避免覆盖，当前为临时体验；原存档未删除。可在帮助中重试，或明确选择重新开始 v0.4。';}
+}catch(_){storageBlocked=true;loadNotice='Your saved progress could not be loaded. This session is temporary to avoid overwriting it. The original save has not been deleted. Retry in Help or explicitly start over with  v0.4. ';}
+EnglishCopy.migrate(state, STORAGE_KEY, storageBlocked);
 const ui={app:['work','overview','documents','journal','personal','calendar'].includes(state.app)?state.app:'work',modal:null,checks:{},notifyFriend:true,leaveChoice:null,saveBeforeLeave:true,toastTimer:null,lastFocus:null};
 
 function persist(){
@@ -77,7 +78,7 @@ function persist(){
  updateStorageNotice();
 }
 
-function updateStorageNotice(){const el=document.getElementById('storage-status');if(el)el.textContent=storageBlocked?'存档未覆盖 · 查看帮助':storageAvailable?'':'本次进度暂时无法存储 · 查看帮助';}
+function updateStorageNotice(){const el=document.getElementById('storage-status');if(el)el.textContent=storageBlocked?'Original save preserved · View help':storageAvailable?'':'Progress cannot be saved right now · View help';}
 
 function addEvent(type,data={}){state.events.push({type,at:state.clock,...data});}
 function addMessage(channel,side,text,time=state.clock,id=null,attachment=null){
@@ -97,18 +98,18 @@ function unread(channel){return (channel==='work'?state.workMessages:state.priva
 
 function markRead(channel){if(typeof Desktop!=='undefined')Desktop.readVisible();}
 
-function ensureInvite(){if(state.inviteSent)return;state.inviteSent=true;addMessage('personal','them','六点半老地方？我带球，你直接过来就行。','17:20','friend-invite');addEvent('invitation_received',{at:'17:20'});}
-function offerOvertime(){if(state.overtimeOffered)return;state.overtimeOffered=true;addMessage('work','them','明早要用的汇总表，今晚有空提前整理一下吗？做完可以记额外绩效。','17:20','overtime-offer','overtime');addEvent('overtime_offered',{at:'17:20'});}
+function ensureInvite(){if(state.inviteSent)return;state.inviteSent=true;addMessage('personal','them','Same place at six thirty? I’ll bring the ball. Just come straight over.','17:20','friend-invite');addEvent('invitation_received',{at:'17:20'});}
+function offerOvertime(){if(state.overtimeOffered)return;state.overtimeOffered=true;addMessage('work','them','We need the summary tomorrow morning. Have time to put it together tonight? It will count toward extra performance credit.','17:20','overtime-offer','overtime');addEvent('overtime_offered',{at:'17:20'});}
 function announce(text){document.getElementById('announcement').textContent=text;}
 function toast(text){clearTimeout(ui.toastTimer);document.getElementById('toast-root').innerHTML=`<div class="toast">${icon('check')}<span>${escapeHTML(text)}</span></div>`;ui.toastTimer=setTimeout(()=>{document.getElementById('toast-root').innerHTML='';},4300);}
 function canWork(){return state.stage==='day';}
 function actualPlanStatus(){
- if(state.activity==='basketball')return '已赴约';
- if(state.activity==='rest')return '未参加 · 在家休息';
- if(state.activity==='overtime')return state.events.some(e=>e.type==='missed_promise')?'未赴约':'未参加';
- return state.friendReply==='yes'?'已确认':state.friendReply==='no'?'已取消':'待确认';
+ if(state.activity==='basketball')return 'Attended';
+ if(state.activity==='rest')return 'Not attending · Rest at home';
+ if(state.activity==='overtime')return state.events.some(e=>e.type==='missed_promise')?'Missed the game':'Not attending';
+ return state.friendReply==='yes'?'Confirmed':state.friendReply==='no'?'Cancelled':'Awaiting confirmation';
 }
-function workEntries(){const entries=tasks.filter(t=>state.completed.includes(t.id)).map(t=>({title:t.title,time:t.time,reward:t.reward}));if(state.overtimeDone)entries.push({title:'完成临时汇总表',time:'19:40',reward:8});return entries;}
+function workEntries(){const entries=tasks.filter(t=>state.completed.includes(t.id)).map(t=>({title:t.title,time:t.time,reward:t.reward}));if(state.overtimeDone)entries.push({title:'Complete the additional summary',time:'19:40',reward:8});return entries;}
 function saveWork(){
  if(state.stage==='tuesday'||!state.workDirty)return;
  state.savedEntries=workEntries().map(e=>({...e}));state.savedWorkAt=state.clock;state.workDirty=false;
@@ -137,31 +138,31 @@ function completeTask(id){
  state.completed.push(id);state.performance+=task.reward;state.clock=task.time;state.lastWorkAt=task.time;state.workDirty=true;
  addEvent('task_completed',{task:id,performanceDelta:task.reward,lifeDelta:0});
  const feedback={
-  report:['报告两处批注已经更新，文件已提交。','收到了，麻烦把更新版也发给客户。','email'],
-  email:['更新版已发给客户，报告附件一并发送。','好。把这次报告和往来邮件归到本周目录，之后找起来方便。','archive'],
-  archive:['本周目录已更新，报告和邮件都归好了。','目录看到了。下午例会的纪要也放在这里，散会后帮忙核对一下。','meeting'],
-  meeting:['会议纪要已确认，后续安排没有遗漏。','收到了，今天这几项都齐了。谢谢。',null]
+  report:['Both comments in the report have been addressed. The file is submitted.','Received, thanks. Could you send the updated version to the client too?','email'],
+  email:['The updated report has been emailed to the client as an attachment.','Great. File the report and the emails in this week’s folder so they’re easy to find later.','archive'],
+  archive:['This week’s folder is updated. The report and emails are filed.','Got the folder. I’ve also put the afternoon meeting notes here. Could you check them after the meeting?','meeting'],
+  meeting:['The meeting notes are confirmed. All follow-up actions are included.','Got it. That’s everything for today. Thanks.',null]
  };
  const [sent,answer,next]=feedback[id];
  addMessage('work','me',sent,task.time,id+'-submitted');
  addMessage('work','them',answer,task.time,id+'-receipt',next);
  if(id==='meeting'){ensureInvite();offerOvertime();}
  ui.modal=null;persist();render();
- toast(`${id==='email'?'邮件已发送':id==='archive'?'资料已归档':'已提交'} · 绩效 +${task.reward}`);
- announce(id==='meeting'?'今日绩效20 / 20。工作消息和私人聊天各有新消息。':`${task.title}已记录，主管有新的回复。`);
+ toast(`${id==='email'?'Email sent':id==='archive'?'Files archived':'Submitted'} · Performance +${task.reward}`);
+ announce(id==='meeting'?'Today’s performance 20 / 20. There are new messages in both work and private chats.':`${task.title} recorded. Your manager has replied.`);
 }
 
 function respondFriend(reply){
  if(!['yes','no','later'].includes(reply)||!state.inviteSent||state.activity||state.stage==='tuesday'||state.friendReply===reply)return;
- const texts={yes:'来，六点半见。',no:'今天先不去了，手头还有点事。',later:'我晚点确定，再跟你说。'};
- const answers={yes:'好，我给你留个位置。',no:'行，那下次。你忙完早点休息。',later:'好，我六点出门，你定好了告诉我。'};
+ const texts={yes:'Yes, see you at six thirty.',no:'I can’t make it tonight. I’ve still got a few things to do.',later:'I’ll decide a little later and let you know.'};
+ const answers={yes:'Great, I’ll save you a spot.',no:'Okay, another time. Get some rest when you’re done.',later:'Okay. I’m heading out at six. Let me know when you decide.'};
  addMessage('personal','me',texts[reply]);addMessage('personal','them',answers[reply]);
  state.friendReply=reply;state.notifiedFriend=reply==='no';addEvent('friend_replied',{reply,performanceDelta:0,lifeDelta:0});markRead('personal');persist();render();scrollChat();
 }
 function respondWork(reply){
  if(!['accepted','deferred'].includes(reply)||!canWork()||!state.overtimeOffered||state.overtimeDone||state.overtimeReply===reply)return;
- addMessage('work','me',reply==='accepted'?'今晚先把汇总做完。':'我明早上班后处理。');
- addMessage('work','them',reply==='accepted'?'好，文件发你了，整理好直接提交就行。':'好，那明早先处理这份。');
+ addMessage('work','me',reply==='accepted'?'I’ll finish the summary tonight.':'I’ll handle it tomorrow morning at work.');
+ addMessage('work','them',reply==='accepted'?'Great, I’ve sent the file. Submit it when you’re done.':'All right. Start with that tomorrow morning.');
  state.overtimeReply=reply;addEvent('overtime_replied',{reply,performanceDelta:0,lifeDelta:0});markRead('work');persist();render();scrollChat();
 }
 function clockOut(){if(['day','evening'].includes(state.stage)&&!state.activity)openModal('leave');}
@@ -171,29 +172,29 @@ function doActivity(activity){
  if(ui.saveBeforeLeave)saveWork();
  addEvent('left_computer',{activity,unfinished:tasks.filter(t=>!state.completed.includes(t.id)).map(t=>t.id),saved:!state.workDirty});
  if(state.overtimeOffered&&state.overtimeReply!=='deferred'){
-  addMessage('work','me','我明早上班后处理。');addMessage('work','them','好，那明早先处理这份。');
+  addMessage('work','me','I’ll handle it tomorrow morning at work.');addMessage('work','them','All right. Start with that tomorrow morning.');
   state.overtimeReply='deferred';addEvent('overtime_replied',{reply:'deferred',source:'leaving_computer',performanceDelta:0,lifeDelta:0});
  }
  // For an early departure this is an explicit jump to the evening arrangement.
  ensureInvite();state.clock='18:05';
  const prior=state.friendReply;
  if(activity==='basketball'){
-  addMessage('personal','me',prior==='yes'?'我出门了，待会见。':'我现在出门，还赶得上。六点半见。','18:05');
-  addMessage('personal','them',prior==='yes'?'好，门口等你。':'来得及，老地方。','18:05');
+  addMessage('personal','me',prior==='yes'?'I’m heading out. See you soon.':'I’m heading out now. I can still make it. See you at six thirty.','18:05');
+  addMessage('personal','them',prior==='yes'?'Okay, I’ll wait by the entrance.':'There’s still time. Same place.','18:05');
   state.friendReply='yes';state.notifiedFriend=false;state.attended=true;
   addEvent('friend_replied',{reply:'yes',source:'leaving_computer',performanceDelta:0,lifeDelta:0});
   state.life=Math.min(100,state.life+4);addEvent('basketball_attended',{at:'18:30',lifeDelta:4,performanceDelta:0});
-  state.clock='22:10';addMessage('personal','them','今天最后那个球可以啊，下周继续？','22:10','ball-followup');
+  state.clock='22:10';addMessage('personal','them','That last shot today was pretty good! Same again next week?','22:10','ball-followup');
  }else{
   if(prior!=='no'){
-   addMessage('personal','me','今晚有点累，我想在家歇一歇。这次先不去了，改天再打。','18:05');
-   addMessage('personal','them','没事，你好好休息，改天再打。','18:05');
+   addMessage('personal','me','I’m a bit tired. I think I’ll stay home and take it easy tonight. Let’s play another time.','18:05');
+   addMessage('personal','them','No worries. Have a good rest. We’ll play another time.','18:05');
    addEvent('friend_replied',{reply:'no',source:'leaving_computer',performanceDelta:0,lifeDelta:0});
   }
   state.friendReply='no';state.notifiedFriend=true;state.attended=false;
   addEvent('friend_notified',{at:'18:05',reason:'rest'});
   state.life=Math.min(100,state.life+4);addEvent('rest_taken',{at:'20:30',lifeDelta:4,performanceDelta:0});
-  state.clock='21:30';addMessage('personal','them','今晚风有点大。你好好歇着，下回再来。','21:10','rest-followup');
+  state.clock='21:30';addMessage('personal','them','It was pretty windy tonight. Have a good rest. Come along next time.','21:10','rest-followup');
  }
  state.activity=activity;state.stage='night';ui.modal=null;persist();render();openModal('scene',{activity});
 }
@@ -203,29 +204,29 @@ function finishOvertime(){
  if(!Desktop.hasTask('overtime')||!canWork()||!state.overtimeOffered||state.overtimeDone||state.activity||!ui.checks.overtime)return;
  const wasPromised=state.friendReply==='yes';
  if(state.overtimeReply!=='accepted'){
-  addMessage('work','me','今晚先把汇总做完。');state.overtimeReply='accepted';
+  addMessage('work','me','I’ll finish the summary tonight.');state.overtimeReply='accepted';
   addEvent('overtime_replied',{reply:'accepted',source:'submission',performanceDelta:0,lifeDelta:0});
  }
  if(ui.notifyFriend&&state.friendReply!=='no'){
-  addMessage('personal','me','今天先不去了，手头还有点事。抱歉，临时改了安排。','17:25');
-  addMessage('personal','them','行，那我跟他们说一声。你忙完早点休息。','17:25');
+  addMessage('personal','me','I can’t make it tonight after all. Something came up at work. Sorry for changing plans.','17:25');
+  addMessage('personal','them','All right, I’ll let the others know. Get some rest when you’re done.','17:25');
   state.friendReply='no';state.notifiedFriend=true;
   addEvent('friend_replied',{at:'17:25',reply:'no',source:'before_overtime',performanceDelta:0,lifeDelta:0});
   addEvent('friend_notified',{at:'17:25',reason:'overtime'});
  }else if(wasPromised){
   state.notifiedFriend=false;
-  addMessage('personal','them','我们到了，你到哪了？','18:35');
-  addMessage('personal','them','给你留了位置，一直没见你。我先打了。','19:10');
+  addMessage('personal','them','We’re here. Where are you?','18:35');
+  addMessage('personal','them','We saved you a spot but haven’t seen you. I’m going to start playing.','19:10');
   addEvent('missed_promise',{at:'18:30'});
  }else if(state.friendReply!=='no'){
-  state.notifiedFriend=false;addMessage('personal','them','我们开始打了，你今天还过来吗？','18:35');
+  state.notifiedFriend=false;addMessage('personal','them','We’ve started playing. Are you still coming today?','18:35');
  }
  state.performance+=8;state.life=Math.max(0,state.life-3);state.overtimeDone=true;state.activity='overtime';state.attended=false;state.workDirty=true;state.lastWorkAt='19:40';
  state.clock='19:40';state.stage='night';
  addEvent('overtime_completed',{performanceDelta:8,lifeDelta:-3,notifiedFriend:state.notifiedFriend,attended:false});
- addMessage('work','them','汇总表收到了。今晚辛苦，额外绩效已记上。','19:40','overtime-received');
- addMessage('personal','them',wasPromised&&!state.notifiedFriend?'下次来不了，提前说一声就好。你忙完早点休息。':'我们刚打完。你忙完早点休息，下次再约。','19:40','overtime-followup');
- ui.modal=null;persist();render();toast('汇总表已提交 · 额外绩效 +8');
+ addMessage('work','them','Got the summary. Thanks for staying late. I’ve added the extra performance credit.','19:40','overtime-received');
+ addMessage('personal','them',wasPromised&&!state.notifiedFriend?'Just let me know ahead of time next time. Get some rest when you’re done.':'We’ve just finished playing. Get some rest when you’re done. Another time!','19:40','overtime-followup');
+ ui.modal=null;persist();render();toast('Summary submitted · Extra performance +8');
 }
 
 function endDay(){
@@ -234,9 +235,9 @@ function endDay(){
  addEvent('day_ended',{activity:state.activity,performance:state.performance,logSaved:!state.workDirty});
  state.mondayPerformance=state.performance;state.performance=0;state.stage='tuesday';state.clock='09:00';
  Desktop.clearWindows();
- addMessage('work','them',state.completed.includes('report')?'早，昨天那份报告客户又补了两处意见，今天再更新一下。':'早，报告里的两处修改，今天先更新一下。','周二 09:00','tuesday-intro');
- if(state.activity==='basketball')addMessage('personal','them','昨天最后那个球可以啊，下周继续？','周二 08:52','tuesday-ball');
- ui.app='work';ui.modal=null;persist();render();announce('周二上午9点。今日绩效目标25。');
+ addMessage('work','them',state.completed.includes('report')?'Morning. The client added two more comments to yesterday’s report. Could you update it again today?':'Morning. Could you start with those two changes in the report today?','Tuesday 09:00','tuesday-intro');
+ if(state.activity==='basketball')addMessage('personal','them','That last shot yesterday was pretty good! Same again next week?','Tuesday 08:52','tuesday-ball');
+ ui.app='work';ui.modal=null;persist();render();announce('Tuesday morning, 09:00. Today’s performance target: 25. ');
 }
 
 function resetExperience(){
@@ -257,70 +258,70 @@ function viewHTML(){
  return overviewHTML();
 }
 function documentsHTML(){
- return `<div class="view-heading"><h1>项目文档</h1><span class="tiny">本周协作文件</span></div><div class="document-list">${tasks.map((t,i)=>{
+ return `<div class="view-heading"><h1>Project documents</h1><span class="tiny">This week’s shared files</span></div><div class="document-list">${tasks.map((t,i)=>{
  const done=state.completed.includes(t.id),enabled=done||(canWork()&&i===state.completed.length);
- return `<button class="inbox-preview" data-action="task" data-task="${t.id}" ${enabled?'':'disabled'}>${icon(t.symbol)}<span class="inbox-info"><strong>${t.file}</strong><p>${done?'已处理':i===state.completed.length?'待处理':'等待前序事项'}</p></span></button>`;
- }).join('')}${state.overtimeOffered?`<button class="inbox-preview" data-action="task" data-task="overtime" ${canWork()||state.overtimeDone?'':'disabled'}>${icon('file')}<span class="inbox-info"><strong>明早汇总表.xlsx</strong><p>${state.overtimeDone?'已提交':'待处理'}</p></span></button>`:''}</div>`;
+ return `<button class="inbox-preview" data-action="task" data-task="${t.id}" ${enabled?'':'disabled'}>${icon(t.symbol)}<span class="inbox-info"><strong>${t.file}</strong><p>${done?'Processed':i===state.completed.length?'Pending':'Waiting for the previous task'}</p></span></button>`;
+ }).join('')}${state.overtimeOffered?`<button class="inbox-preview" data-action="task" data-task="overtime" ${canWork()||state.overtimeDone?'':'disabled'}>${icon('file')}<span class="inbox-info"><strong>Morning summary.xlsx</strong><p>${state.overtimeDone?'Submitted':'Pending'}</p></span></button>`:''}</div>`;
 }
 
-function performanceHTML(tuesday=false){const p=tuesday?0:state.performance,target=tuesday?25:20;return `<section class="card performance" aria-label="今日绩效 ${p} / ${target}"><div class="perf-head"><span>今日绩效</span>${icon('chart')}</div><div class="perf-number"><strong>${p}</strong><span>/ ${target}</span></div><div class="progress-track" role="progressbar" aria-label="今日绩效目标完成度" aria-valuenow="${Math.min(p,target)}" aria-valuemin="0" aria-valuemax="${target}"><div class="progress-fill" style="width:${Math.min(p/target,1)*100}%"></div></div><div class="perf-note"><span>${p>=target?'今日目标已完成':'Performance target'}</span><span>${p>target?`额外 +${p-target}`:p>=target?'100%':`${Math.round(p/target*100)}%`}</span></div></section>`;}
-function planHTML(){const status=actualPlanStatus();return `<section class="card plan-card"><div class="plan-head"><span>个人日历</span><span>${state.stage==='tuesday'?'昨天':status}</span></div><div class="plan-main"><div class="ball-icon">${icon('ball')}</div><div><div class="plan-time">18:30</div><div class="plan-name">和阿远打球</div></div></div><p class="plan-place">市体育馆 · 室外 2 号场${state.stage==='tuesday'?` · ${status}`:''}</p></section>`;}
-function inboxPreview(channel){const m=lastIncoming(channel),personal=channel==='personal';return `<button class="inbox-preview" data-action="nav" data-app="${channel}" aria-label="打开${personal?'阿远的私人消息':'主管的工作消息'}"><span class="avatar ${personal?'friend':''}">${personal?'远':'主'}</span><span class="inbox-info"><strong>${personal?'阿远 · 私人聊天':'主管 · 工作消息'}</strong><p>${escapeHTML(m.text)}</p></span>${unread(channel)?'<span class="message-pip"></span>':icon('chevron','task-chevron')}</button>`;}
+function performanceHTML(tuesday=false){const p=tuesday?0:state.performance,target=tuesday?25:20;return `<section class="card performance" aria-label="Today’s performance ${p} / ${target}"><div class="perf-head"><span>Today’s performance</span>${icon('chart')}</div><div class="perf-number"><strong>${p}</strong><span>/ ${target}</span></div><div class="progress-track" role="progressbar" aria-label="Daily performance target progress" aria-valuenow="${Math.min(p,target)}" aria-valuemin="0" aria-valuemax="${target}"><div class="progress-fill" style="width:${Math.min(p/target,1)*100}%"></div></div><div class="perf-note"><span>${p>=target?'Daily target reached':'Performance target'}</span><span>${p>target?`Extra +${p-target}`:p>=target?'100%':`${Math.round(p/target*100)}%`}</span></div></section>`;}
+function planHTML(){const status=actualPlanStatus();return `<section class="card plan-card"><div class="plan-head"><span>Personal calendar</span><span>${state.stage==='tuesday'?'Yesterday':status}</span></div><div class="plan-main"><div class="ball-icon">${icon('ball')}</div><div><div class="plan-time">18:30</div><div class="plan-name">Basketball with Yuan</div></div></div><p class="plan-place">City Sports Center · Outdoor Court 2${state.stage==='tuesday'?` · ${status}`:''}</p></section>`;}
+function inboxPreview(channel){const m=lastIncoming(channel),personal=channel==='personal';return `<button class="inbox-preview" data-action="nav" data-app="${channel}" aria-label="Open ${personal?'Yuan’s private messages':'Your manager’s work messages'}"><span class="avatar ${personal?'friend':''}">${personal?'Y':'M'}</span><span class="inbox-info"><strong>${personal?'Yuan · Private chat':'Manager · Work messages'}</strong><p>${escapeHTML(m.text)}</p></span>${unread(channel)?'<span class="message-pip"></span>':icon('chevron','task-chevron')}</button>`;}
 function overviewHTML(){
  const night=state.stage==='night',done=state.completed.length===tasks.length;
- let heading='我的任务';
- let subtitle=done?'今日常规事项已完成。':'本周项目 / 周一待办';
- return `<div class="welcome"><div><div class="eyebrow">我的工作台 <span>/</span> 本周</div><h1>${heading}</h1><p class="subtext">${subtitle}</p></div><div class="daytag">${icon('calendar')}周一 · 工作日</div></div>
+ let heading='My tasks';
+ let subtitle=done?'Today’s regular tasks are complete.':'This week’s project / Monday tasks';
+ return `<div class="welcome"><div><div class="eyebrow">My workspace <span>/</span> This week</div><h1>${heading}</h1><p class="subtext">${subtitle}</p></div><div class="daytag">${icon('calendar')}Monday · Workday</div></div>
  <div class="dashboard"><div class="stack">
 
- <section class="card"><div class="card-head"><h2 class="card-title">${icon('dashboard')}今日待办</h2><span class="tiny">${state.completed.length} / 4 已完成</span></div><div class="task-table-head"><span>任务名称</span><span>状态</span><span>绩效</span></div><div class="tasks">${tasks.map((task,i)=>{const isDone=state.completed.includes(task.id),current=!isDone&&i===state.completed.length&&canWork();return `<button class="task ${isDone?'done':''} ${current?'current':''}" data-action="task" data-task="${task.id}" data-focus="task-${task.id}" ${!isDone&&!current?'disabled':''} aria-label="${task.title}，${isDone?'已完成':current?'可处理':'待处理'}，绩效加${task.reward}"><span class="task-check">${icon(isDone?'check':task.symbol)}</span><span class="task-main"><span class="task-name">${task.title}</span><span class="task-desc">${task.desc}</span></span><span class="task-status ${isDone?'complete':current?'pending':''}">${isDone?'已完成':current?'待处理':'待开始'}</span><span class="task-reward">${isDone?'已记入':`+${task.reward}`}</span>${icon('chevron','task-chevron')}</button>`;}).join('')}</div>${!done&&canWork()?`<div class="task-guidance">${icon('info')}事项相关文件和回执也保留在主管的会话中。</div>`:''}</section>
- ${canWork()&&state.overtimeOffered?`<section class="extra-card"><div class="top"><span class="chip blue">${state.overtimeReply==='deferred'?'已安排明早处理':state.overtimeReply==='accepted'?'已接下 · 尚未提交':'可选 · 新任务'}</span><span class="extra-reward">+8</span></div><h3>提前整理明早的汇总表</h3><p>主管发来一项追加工作，预计完成时间为 19:40。</p><div class="button-row"><button class="btn ${state.overtimeReply==='accepted'?'primary':'soft'}" data-action="task" data-task="overtime">${state.overtimeReply==='accepted'?'打开汇总表':'查看任务文件'}${icon('arrow')}</button><button class="btn link" data-action="nav" data-app="work">查看工作消息</button></div></section>`:''}
+ <section class="card"><div class="card-head"><h2 class="card-title">${icon('dashboard')}Today’s tasks</h2><span class="tiny">${state.completed.length} / 4 Complete</span></div><div class="task-table-head"><span>Task name</span><span>Status</span><span>Performance</span></div><div class="tasks">${tasks.map((task,i)=>{const isDone=state.completed.includes(task.id),current=!isDone&&i===state.completed.length&&canWork();return `<button class="task ${isDone?'done':''} ${current?'current':''}" data-action="task" data-task="${task.id}" data-focus="task-${task.id}" ${!isDone&&!current?'disabled':''} aria-label="${task.title}, ${isDone?'Complete':current?'Ready':'Pending'}, performance +${task.reward}"><span class="task-check">${icon(isDone?'check':task.symbol)}</span><span class="task-main"><span class="task-name">${task.title}</span><span class="task-desc">${task.desc}</span></span><span class="task-status ${isDone?'complete':current?'pending':''}">${isDone?'Complete':current?'Pending':'Not started'}</span><span class="task-reward">${isDone?'Credited':`+${task.reward}`}</span>${icon('chevron','task-chevron')}</button>`;}).join('')}</div>${!done&&canWork()?`<div class="task-guidance">${icon('info')}Related files and submission receipts are also kept in your manager’s conversation.</div>`:''}</section>
+ ${canWork()&&state.overtimeOffered?`<section class="extra-card"><div class="top"><span class="chip blue">${state.overtimeReply==='deferred'?'Scheduled for tomorrow morning':state.overtimeReply==='accepted'?'Accepted · Not submitted yet':'Optional · New task'}</span><span class="extra-reward">+8</span></div><h3>Prepare tomorrow’s summary early</h3><p>Your manager has offered an additional task, expected to finish at  19:40. </p><div class="button-row"><button class="btn ${state.overtimeReply==='accepted'?'primary':'soft'}" data-action="task" data-task="overtime">${state.overtimeReply==='accepted'?'Open summary':'View task file'}${icon('arrow')}</button><button class="btn link" data-action="nav" data-app="work">View work messages</button></div></section>`:''}
  ${inboxPreview('work')}
  </div><aside class="stack">${performanceHTML()}</aside></div>`;
 }
 function footerHTML(){
  const tuesday=state.stage==='tuesday';
- return `<footer class="footerbar"><div class="foot-status"><span class="status-dot ${state.workDirty?'':'saved'}"></span><span>${tuesday?`周一日志 · ${state.workDirty?'有未保存草稿':'已保存'}`:state.workDirty?'工作日志 · 尚未保存':`工作日志已保存 · ${state.savedWorkAt}`}</span></div><div class="button-row">${tuesday?'<button class="btn" data-action="nav" data-app="journal">查看周一日志</button>':`<button class="btn" data-action="save" ${state.workDirty?'':'disabled'}>${icon('save')}保存工作日志</button>`}</div></footer>`;
+ return `<footer class="footerbar"><div class="foot-status"><span class="status-dot ${state.workDirty?'':'saved'}"></span><span>${tuesday?`Monday log · ${state.workDirty?'Unsaved draft available':'Saved'}`:state.workDirty?'Work log · Not saved yet':`Work log saved · ${state.savedWorkAt}`}</span></div><div class="button-row">${tuesday?'<button class="btn" data-action="nav" data-app="journal">View Monday’s log</button>':`<button class="btn" data-action="save" ${state.workDirty?'':'disabled'}>${icon('save')}Save work log</button>`}</div></footer>`;
 }
 
 function chatHTML(channel){
  const personal=channel==='personal',messages=personal?state.privateMessages:state.workMessages;
- const contact=personal?'阿远':'主管';let replies='';
+ const contact=personal?'Yuan':'Manager';let replies='';
  if(personal&&state.inviteSent&&!state.activity&&state.stage!=='tuesday'){
-  replies=`<div class="composer-label"><span>${state.friendReply?'更新今晚的安排':'快捷回复'}</span><span>18:30 · 老地方</span></div><div class="reply-buttons">${[['yes','来，六点半见。'],['no','今天先不去了，手头还有点事。'],['later','我晚点确定，再跟你说。']].map(([id,text])=>`<button class="reply-btn ${state.friendReply===id?'selected':''}" data-action="friend-reply" data-reply="${id}" aria-pressed="${state.friendReply===id}" ${state.friendReply===id?'disabled':''}>${text}</button>`).join('')}</div>`;
+  replies=`<div class="composer-label"><span>${state.friendReply?'Update tonight’s plans':'Quick replies'}</span><span>18:30 · Same place</span></div><div class="reply-buttons">${[['yes','Yes, see you at six thirty.'],['no','I can’t make it tonight. I’ve still got a few things to do.'],['later','I’ll decide a little later and let you know.']].map(([id,text])=>`<button class="reply-btn ${state.friendReply===id?'selected':''}" data-action="friend-reply" data-reply="${id}" aria-pressed="${state.friendReply===id}" ${state.friendReply===id?'disabled':''}>${text}</button>`).join('')}</div>`;
  }else if(!personal&&canWork()&&state.overtimeOffered){
-  replies=`<div class="composer-label"><span>回复这项追加工作</span><span>明早需要 · 额外绩效 +8</span></div><div class="reply-buttons"><button class="reply-btn ${state.overtimeReply==='accepted'?'selected':''}" data-action="work-reply" data-reply="accepted" ${state.overtimeReply==='accepted'?'disabled':''}>今晚先把汇总做完。</button><button class="reply-btn ${state.overtimeReply==='deferred'?'selected':''}" data-action="work-reply" data-reply="deferred" ${state.overtimeReply==='deferred'?'disabled':''}>我明早上班后处理。</button>${state.overtimeReply==='accepted'?'<button class="btn primary" data-action="task" data-task="overtime">打开汇总表</button>':''}</div>`;
+  replies=`<div class="composer-label"><span>Reply to the additional work request</span><span>Needed tomorrow morning · Extra performance +8</span></div><div class="reply-buttons"><button class="reply-btn ${state.overtimeReply==='accepted'?'selected':''}" data-action="work-reply" data-reply="accepted" ${state.overtimeReply==='accepted'?'disabled':''}>I’ll finish the summary tonight.</button><button class="reply-btn ${state.overtimeReply==='deferred'?'selected':''}" data-action="work-reply" data-reply="deferred" ${state.overtimeReply==='deferred'?'disabled':''}>I’ll handle it tomorrow morning at work.</button>${state.overtimeReply==='accepted'?'<button class="btn primary" data-action="task" data-task="overtime">Open summary</button>':''}</div>`;
  }else if(!personal&&canWork()&&state.completed.length<tasks.length){
   const next=tasks[state.completed.length];
-  replies=`<div class="composer-label"><span>会话待办 · ${next.title}</span></div><button class="btn soft" data-action="task" data-task="${next.id}">${icon(next.symbol)}${next.id==='report'?'打开报告中的批注':next.id==='email'?'打开邮件草稿':next.id==='archive'?'打开归档目录':'打开会议纪要'}</button>`;
- }else replies=`<div class="quiet-composer">${personal&&!state.inviteSent?'这是昨晚留下的消息。今天的安排还在日历里。':state.stage==='tuesday'?'周一的消息已保留。':'当前消息已保留。'}</div>`;
- return `<div class="view-heading"><div><div class="eyebrow">${personal?'PERSONAL / MESSAGES':'WORK / MESSAGES'}</div><h1>${personal?'私人聊天':'工作消息'}</h1><p class="subtext">${personal?'联系人与聊天记录':'项目沟通与文件回执'}</p></div><span class="chip ${personal?'warm':''}">${personal?'个人账号':'工作账号'}</span></div><div class="chat-layout ${personal?'personal-chat':''}"><aside class="chat-contacts"><div class="contact-search">${icon('chat')}会话列表</div><div class="contact-label">${personal?'私人会话':'项目会话'}</div><div class="contact" aria-current="true"><div class="avatar ${personal?'friend':''}">${personal?'远':'主'}</div><div><strong>${contact}</strong><p>${personal?'老朋友':'项目沟通'}</p></div></div><p class="contact-note">${personal?'上一次聊天：<br>“下周再打吧。”':'今天的文件与更新，<br>都在这个会话中。'}</p>${!personal?`<div class="conversation-tasks"><div class="shelf-label">${state.stage==='tuesday'?'周一工作':'今日常规工作'}</div>${tasks.map((t,i)=>`<button data-action="task" data-task="${t.id}" ${state.completed.includes(t.id)||(canWork()&&i===state.completed.length)?'':'disabled'}>${icon(state.completed.includes(t.id)?'check':t.symbol)}<span>${t.title}</span><small>${state.completed.includes(t.id)?'已完成':'+'+t.reward}</small></button>`).join('')}</div>`:''}</aside><section class="chat-main" aria-label="与${contact}的聊天"><div class="chat-titlebar"><div><strong>${contact}</strong><p>${personal?'私人聊天 · 仅你可见':'项目沟通'}</p></div>${icon(personal?'chat':'work')}</div><div class="chat-stream" tabindex="0" aria-label="聊天记录">${messages.map(m=>`<div class="chat-time">${escapeHTML(state.stage==='tuesday'&&!m.time.includes('周')?'周一 '+m.time:m.time)}</div><div data-message="${escapeHTML(m.id)}" data-channel="${channel}" class="bubble-row ${m.side==='me'?'mine':''}"><span class="avatar ${m.side==='me'?'self':personal?'friend':''}">${m.side==='me'?'我':personal?'远':'主'}</span><div class="bubble">${escapeHTML(m.text)}${m.attachment?`<button class="attachment" data-action="task" data-task="${escapeHTML(m.attachment)}">${icon('file')}<span>${escapeHTML(m.attachment==='overtime'?'明早汇总表.xlsx':tasks.find(t=>t.id===m.attachment)?.file||'项目文件')}</span></button>`:''}</div></div>`).join('')}</div><div class="chat-composer"><div class="composer-toolbar" aria-hidden="true">${icon('chat')}${icon('file')}<span>会话记录</span></div>${replies}</div></section></div>`;
+  replies=`<div class="composer-label"><span>Conversation tasks · ${next.title}</span></div><button class="btn soft" data-action="task" data-task="${next.id}">${icon(next.symbol)}${next.id==='report'?'Open the comments in the report':next.id==='email'?'Open email draft':next.id==='archive'?'Open archive folder':'Open meeting notes'}</button>`;
+ }else replies=`<div class="quiet-composer">${personal&&!state.inviteSent?'This message was left last night. Today’s plans are in your calendar.':state.stage==='tuesday'?'Monday’s messages have been kept.':'Current messages have been kept.'}</div>`;
+ return `<div class="view-heading"><div><div class="eyebrow">${personal?'PERSONAL / MESSAGES':'WORK / MESSAGES'}</div><h1>${personal?'Private chat':'Work messages'}</h1><p class="subtext">${personal?'Contacts and chat history':'Project messages and file receipts'}</p></div><span class="chip ${personal?'warm':''}">${personal?'Personal account':'Work account'}</span></div><div class="chat-layout ${personal?'personal-chat':''}"><aside class="chat-contacts"><div class="contact-search">${icon('chat')}Conversations</div><div class="contact-label">${personal?'Private conversations':'Project conversations'}</div><div class="contact" aria-current="true"><div class="avatar ${personal?'friend':''}">${personal?'Y':'M'}</div><div><strong>${contact}</strong><p>${personal?'Old friend':'Project communication'}</p></div></div><p class="contact-note">${personal?'Last conversation: <br>“Let’s play next week.”':'Today’s files and updates <br>are all in this conversation.'}</p>${!personal?`<div class="conversation-tasks"><div class="shelf-label">${state.stage==='tuesday'?'Monday work':'Today’s regular work'}</div>${tasks.map((t,i)=>`<button data-action="task" data-task="${t.id}" ${state.completed.includes(t.id)||(canWork()&&i===state.completed.length)?'':'disabled'}>${icon(state.completed.includes(t.id)?'check':t.symbol)}<span>${t.title}</span><small>${state.completed.includes(t.id)?'Complete':'+'+t.reward}</small></button>`).join('')}</div>`:''}</aside><section class="chat-main" aria-label="Conversation with ${contact}"><div class="chat-titlebar"><div><strong>${contact}</strong><p>${personal?'Private chat · Only visible to you':'Project communication'}</p></div>${icon(personal?'chat':'work')}</div><div class="chat-stream" tabindex="0" aria-label="Chat history">${messages.map(m=>`<div class="chat-time">${escapeHTML(state.stage==='tuesday'&&/^\d{2}:\d{2}$/.test(m.time)?'Monday '+m.time:m.time)}</div><div data-message="${escapeHTML(m.id)}" data-channel="${channel}" class="bubble-row ${m.side==='me'?'mine':''}"><span class="avatar ${m.side==='me'?'self':personal?'friend':''}">${m.side==='me'?'Me':personal?'Y':'M'}</span><div class="bubble">${escapeHTML(m.text)}${m.attachment?`<button class="attachment" data-action="task" data-task="${escapeHTML(m.attachment)}">${icon('file')}<span>${escapeHTML(m.attachment==='overtime'?'Morning summary.xlsx':tasks.find(t=>t.id===m.attachment)?.file||'Project file')}</span></button>`:''}</div></div>`).join('')}</div><div class="chat-composer"><div class="composer-toolbar" aria-hidden="true">${icon('chat')}${icon('file')}<span>Conversation history</span></div>${replies}</div></section></div>`;
 }
 function calendarHTML(){
  const status=actualPlanStatus();
- return `<div class="view-heading"><div><div class="eyebrow">PERSONAL / CALENDAR</div><h1>我的日历</h1><p class="subtext">${state.stage==='tuesday'?'昨天留下的安排':'今天原本的安排'}</p></div><span class="chip warm">个人账号</span></div><div class="calendar-layout"><section class="card"><div class="calendar-date"><div class="calendar-num">一<span>星期</span></div><div><h2>本周日程</h2><p>${state.stage==='tuesday'?'昨天的安排':'本周 / 第一天'}</p></div></div><div class="calendar-timeline"><div class="calendar-row"><div class="cal-time">18:30</div><div class="cal-event personal ${['已取消','未赴约','未参加','已改期'].includes(status)?'cancelled':''}"><h3><button class="calendar-detail-link" data-desktop="calendar-detail">和阿远打球</button><span class="calendar-state">${status}</span></h3><p>市体育馆 · 室外 2 号场</p><p>“上次改到了今天。”</p></div></div>${state.activity==='basketball'?'<div class="calendar-row"><div class="cal-time">22:10</div><div class="cal-event personal"><h3>打完球回到家</h3><p>和阿远打了最后一场，散场后聊了一会儿。</p></div></div>':''}${state.activity==='rest'?'<div class="calendar-row"><div class="cal-time">20:30</div><div class="cal-event personal"><h3>在家休息</h3><p>今晚没有再安排别的事情</p></div></div>':''}</div></section><aside class="card calendar-note"><span class="eyebrow">周末便签</span><p>补完那张画。<br>买一支新笔。<br>给植物换个大一点的盆。</p><button class="btn link" data-action="nav" data-app="personal">打开私人聊天${icon('arrow')}</button></aside></div>`;
+ return `<div class="view-heading"><div><div class="eyebrow">PERSONAL / CALENDAR</div><h1>My calendar</h1><p class="subtext">${state.stage==='tuesday'?'Yesterday’s plans':'Your original plans for today'}</p></div><span class="chip warm">Personal account</span></div><div class="calendar-layout"><section class="card"><div class="calendar-date"><div class="calendar-num">Mon<span>Weekday</span></div><div><h2>This week’s schedule</h2><p>${state.stage==='tuesday'?'Yesterday’s plans':'This week / Day One'}</p></div></div><div class="calendar-timeline"><div class="calendar-row"><div class="cal-time">18:30</div><div class="cal-event personal ${['Cancelled','Missed the game','Not attending','Rescheduled'].includes(status)?'cancelled':''}"><h3><button class="calendar-detail-link" data-desktop="calendar-detail">Basketball with Yuan</button><span class="calendar-state">${status}</span></h3><p>City Sports Center · Outdoor Court 2</p><p>“We moved it to today last time.”</p></div></div>${state.activity==='basketball'?'<div class="calendar-row"><div class="cal-time">22:10</div><div class="cal-event personal"><h3>Home after the game</h3><p>You played one last game with Yuan, then stayed to chat for a while.</p></div></div>':''}${state.activity==='rest'?'<div class="calendar-row"><div class="cal-time">20:30</div><div class="cal-event personal"><h3>Rest at home</h3><p>Nothing else planned for tonight</p></div></div>':''}</div></section><aside class="card calendar-note"><span class="eyebrow">Weekend note</span><p>Finish that sketch.<br>Buy a new pen.<br>Get a bigger pot for the plant.</p><button class="btn link" data-action="nav" data-app="personal">Open chat${icon('arrow')}</button></aside></div>`;
 }
-function journalRows(entries){return entries.length?entries.map(e=>`<tr><td>${escapeHTML(e.time)}</td><td>${escapeHTML(e.title)}</td><td>+${Number(e.reward)||0}</td></tr>`).join(''):'<tr><td colspan="3"><div class="empty-note">还没有已完成的工作记录。</div></td></tr>';}
-function journalContent(entries,archive=false){const total=entries.reduce((s,e)=>s+e.reward,0);return `<div class="journal-meta"><div><h2>周一工作日志</h2><div class="journal-date">MONDAY · WORK LOG / 001</div></div><span class="chip ${state.workDirty&&!archive?'warm':'done'}">${archive?'已归档':state.workDirty?'尚未保存':'已保存'}</span></div><table class="journal-table"><thead><tr><th>时间</th><th>已完成事项</th><th>绩效</th></tr></thead><tbody>${journalRows(entries)}</tbody></table><div class="journal-total"><span>工作事项合计</span><strong>${total} / 20</strong></div><p class="journal-disclaimer">记录范围：已完成的工作事项与绩效回执。</p>`;}
+function journalRows(entries){return entries.length?entries.map(e=>`<tr><td>${escapeHTML(e.time)}</td><td>${escapeHTML(e.title)}</td><td>+${Number(e.reward)||0}</td></tr>`).join(''):'<tr><td colspan="3"><div class="empty-note">No completed work has been recorded yet.</div></td></tr>';}
+function journalContent(entries,archive=false){const total=entries.reduce((s,e)=>s+e.reward,0);return `<div class="journal-meta"><div><h2>Monday work log</h2><div class="journal-date">MONDAY · WORK LOG / 001</div></div><span class="chip ${state.workDirty&&!archive?'warm':'done'}">${archive?'Archived':state.workDirty?'Not saved yet':'Saved'}</span></div><table class="journal-table"><thead><tr><th>Time</th><th>Completed items</th><th>Performance</th></tr></thead><tbody>${journalRows(entries)}</tbody></table><div class="journal-total"><span>Completed work total</span><strong>${total} / 20</strong></div><p class="journal-disclaimer">This log records completed work and performance receipts.</p>`;}
 function journalHTML(){
  const tuesday=state.stage==='tuesday';
- return `<div class="view-heading"><div><h1>工作日志</h1><p class="subtext">${tuesday?'周一 / 已保存记录':'周一 / 当前工作记录'}</p></div></div><section class="card journal">${journalContent(tuesday?state.savedEntries:workEntries(),tuesday)}</section>${tuesday&&state.workDirty?`<details class="unsaved-draft"><summary>查看周一未保存的草稿（未计入已保存日志）</summary>${journalRowsTable()}</details>`:''}`;
+ return `<div class="view-heading"><div><h1>Work log</h1><p class="subtext">${tuesday?'Monday / Saved records':'Monday / Current work record'}</p></div></div><section class="card journal">${journalContent(tuesday?state.savedEntries:workEntries(),tuesday)}</section>${tuesday&&state.workDirty?`<details class="unsaved-draft"><summary>View Monday’s unsaved draft (not included in the saved log)</summary>${journalRowsTable()}</details>`:''}`;
 }
-function journalRowsTable(){return `<table class="journal-table"><thead><tr><th>时间</th><th>事项</th><th>绩效</th></tr></thead><tbody>${journalRows(workEntries())}</tbody></table>`;}
+function journalRowsTable(){return `<table class="journal-table"><thead><tr><th>Time</th><th>Item</th><th>Performance</th></tr></thead><tbody>${journalRows(workEntries())}</tbody></table>`;}
 
 
 function tuesdayHTML(){
- const carried=tasks.filter(t=>!state.completed.includes(t.id)).map(t=>[t.title,'从周一延续 · 尚未完成']);
- const tomorrow=carried.length?[...carried,...(state.completed.includes('report')?[["再次修改报告","客户补充了新的意见"]]:[])]:[['再次修改报告','客户补充了新的意见'],['回复新增邮件','请确认本周最新安排'],['更新项目资料','同步已经确认的版本']];
- return `<div class="welcome"><div><div class="eyebrow">TUESDAY / DAY 02</div><h1>周二待办</h1><p class="subtext">新的一天，新的待办。</p></div><div class="daytag">${icon('calendar')}周二 · 工作日</div></div><div class="dashboard"><div class="stack"><section class="card"><div class="card-head"><h2 class="card-title">${icon('dashboard')}今日待办</h2><span class="tiny">待处理</span></div><div class="tasks">${tomorrow.map(([a,b])=>`<div class="tuesday-task"><span class="task-check">${icon('file')}</span><span class="task-main"><span class="task-name">${a}</span><span class="task-desc">${b}</span></span></div>`).join('')}</div></section>${inboxPreview('work')}</div><aside class="stack">${performanceHTML(true)}<section class="card note-card"><div class="plan-head"><span>昨天的工作记录</span>${icon('save')}</div><p>${state.savedEntries.length} 项工作已保存。<br>最后一项完成于 ${state.lastWorkAt||'—'}。</p></section></aside></div>`;
+ const carried=tasks.filter(t=>!state.completed.includes(t.id)).map(t=>[t.title,'Carried over from Monday · Not completed yet']);
+ const tomorrow=carried.length?[...carried,...(state.completed.includes('report')?[["Revise the report again","The client has added more comments"]]:[])]:[['Revise the report again','The client has added more comments'],['Reply to new emails','Please confirm this week’s latest plans.'],['Update project files','Share the confirmed version']];
+ return `<div class="welcome"><div><div class="eyebrow">TUESDAY / DAY 02</div><h1>Tuesday tasks</h1><p class="subtext">A new day, a new to-do list.</p></div><div class="daytag">${icon('calendar')}Tuesday · Workday</div></div><div class="dashboard"><div class="stack"><section class="card"><div class="card-head"><h2 class="card-title">${icon('dashboard')}Today’s tasks</h2><span class="tiny">Pending</span></div><div class="tasks">${tomorrow.map(([a,b])=>`<div class="tuesday-task"><span class="task-check">${icon('file')}</span><span class="task-main"><span class="task-name">${a}</span><span class="task-desc">${b}</span></span></div>`).join('')}</div></section>${inboxPreview('work')}</div><aside class="stack">${performanceHTML(true)}<section class="card note-card"><div class="plan-head"><span>Yesterday’s work record</span>${icon('save')}</div><p>${state.savedEntries.length}  work items saved.<br>Last task completed at  ${state.lastWorkAt||'—'}. </p></section></aside></div>`;
 }
 function taskModalHTML(task){
- if(task.id==='report')return `<div class="document-grid"><section class="document-paper"><div class="doc-heading">项目进度报告</div><div class="doc-byline">项目协作 / 本周报告 · 版本 3.0</div><div class="doc-section">02 · 本月需求概览</div><table class="doc-table"><thead><tr><th>项目</th><th>当前数据</th></tr></thead><tbody><tr><td>已接收需求</td><td><span class="doc-old">36</span><span class="doc-highlight">38</span></td></tr><tr><td>已确认排期</td><td>31</td></tr></tbody></table><div class="doc-section">03 · 补充说明</div><p class="doc-line"><span class="doc-highlight">两条新增需求将列入下周评估。</span></p><p class="doc-line">其余已确认事项按原计划推进。</p></section><aside class="document-aside"><div class="doc-comment"><strong>主管 · 批注</strong><br>这次只改两处：需求总数更新为 38，并补上新增需求的处理说明。</div><div class="doc-checks-title">提交前核对</div><label class="checkline"><input type="checkbox" data-check="number">已核对数据更新</label><label class="checkline"><input type="checkbox" data-check="note">已确认补充说明</label></aside></div>`;
- if(task.id==='email')return `<div class="email-field"><span>收件人</span>客户项目组 &lt;project@example.com&gt;</div><div class="email-field"><span>主题</span>回复：本周项目进度</div><div class="email-body">您好，<br><br>报告中的两处内容已经更新，最新版本见附件。<br>两条新增需求将列入下周评估，其余事项按原计划推进。<br><br>请查收，谢谢。</div><div class="small-file">${icon('file')}项目报告_v3.docx · 已附加</div>`;
- if(task.id==='archive')return `<h3>把确认过的版本放好。</h3><p class="modal-description">已提交的报告与往来邮件，归入本周项目目录。</p><div class="folder-row">${icon('folder')}项目资料 / 本周归档 / 已确认</div><div class="folder-row">${icon('file')}项目报告_v3.docx<span class="chip blue" style="margin-left:auto">最新版本</span></div><div class="folder-row">${icon('mail')}客户邮件往来 · 周一</div><label class="checkline" style="margin-top:22px"><input type="checkbox" data-check="archive">已确认目录中的报告为更新后的版本</label>`;
- return `<span class="chip">16:00 项目例会</span><h3 style="margin-top:13px">本次讨论结果</h3><ul class="meeting-list"><li>报告更新已提交，等待客户确认。</li><li>两条新增需求在下周进行评估。</li><li>本周共享目录已整理，后续统一使用最新版本。</li></ul><p class="modal-description">确认纪要后，今天的常规待办就处理完了。</p>`;
+ if(task.id==='report')return `<div class="document-grid"><section class="document-paper"><div class="doc-heading">Project progress report</div><div class="doc-byline">Project collaboration / This week’s report · Version 3.0</div><div class="doc-section">02 · Monthly request overview</div><table class="doc-table"><thead><tr><th>Project</th><th>Current data</th></tr></thead><tbody><tr><td>Requests received</td><td><span class="doc-old">36</span><span class="doc-highlight">38</span></td></tr><tr><td>Confirmed schedule</td><td>31</td></tr></tbody></table><div class="doc-section">03 · Additional notes</div><p class="doc-line"><span class="doc-highlight">The two new requests will be reviewed next week.</span></p><p class="doc-line">All other confirmed items stay on schedule.</p></section><aside class="document-aside"><div class="doc-comment"><strong>Manager · Comments</strong><br>Only two changes: update the total number of requests to  38,  and add a note on how the new requests will be handled.</div><div class="doc-checks-title">Check before submitting</div><label class="checkline"><input type="checkbox" data-check="number">Data update checked</label><label class="checkline"><input type="checkbox" data-check="note">Additional note confirmed</label></aside></div>`;
+ if(task.id==='email')return `<div class="email-field"><span>To</span>Client project team &lt;project@example.com&gt;</div><div class="email-field"><span>Subject</span>Re: This week’s project update</div><div class="email-body">Hello,<br><br>Both updates are in the report. Please find the latest version attached.<br>The two new requests will be reviewed next week. Everything else stays on schedule.<br><br>Thank you. Please let me know if you need anything else.</div><div class="small-file">${icon('file')}Project report_v3.docx · Attached</div>`;
+ if(task.id==='archive')return `<h3>Put the confirmed versions in the folder.</h3><p class="modal-description">File the submitted report and email correspondence in this week’s project folder.</p><div class="folder-row">${icon('folder')}Project files / This week’s archive / Confirmed</div><div class="folder-row">${icon('file')}Project report_v3.docx<span class="chip blue" style="margin-left:auto">Latest version</span></div><div class="folder-row">${icon('mail')}Client correspondence · Monday</div><label class="checkline" style="margin-top:22px"><input type="checkbox" data-check="archive">I have checked that the report in the folder is the updated version.</label>`;
+ return `<span class="chip">16:00 Project meeting</span><h3 style="margin-top:13px">Meeting outcomes</h3><ul class="meeting-list"><li>The report update has been submitted and is awaiting client confirmation.</li><li>Review the two new requests next week.</li><li>This week’s shared folder is organized. Please use the latest versions from now on.</li></ul><p class="modal-description">Confirm these notes to finish today’s regular tasks.</p>`;
 }
-function modalFrame(title,body,actions='',wide=false,symbol='file'){return `<div class="modal-backdrop" data-action="overlay-close"><section class="modal ${wide?'wide':''}" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><header class="modal-header"><h2 id="modal-title">${icon(symbol)}${title}</h2><button class="close-btn" data-action="close" aria-label="关闭窗口">${icon('close')}</button></header>${body}${actions}</section></div>`;}
+function modalFrame(title,body,actions='',wide=false,symbol='file'){return `<div class="modal-backdrop" data-action="overlay-close"><section class="modal ${wide?'wide':''}" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><header class="modal-header"><h2 id="modal-title">${icon(symbol)}${title}</h2><button class="close-btn" data-action="close" aria-label="Close window">${icon('close')}</button></header>${body}${actions}</section></div>`;}
 function renderModal(){
  const root=document.getElementById('modal-root');
  const background=document.getElementById('desktop');background.inert=!!ui.modal;
@@ -328,28 +329,28 @@ function renderModal(){
  const {kind}=ui.modal;let html='';
  if(kind==='leave'){
   const unfinished=tasks.length-state.completed.length;
-  html=modalFrame('离开电脑 · 我的安排',`<div class="modal-body"><p class="modal-description">${state.clock<'17:20'?'结束今天的工作，余下时间不再处理新文件。晚间安排如下。':'今天先到这里。接下来打算做什么？'}</p><p class="tiny">${unfinished?`还有 ${unfinished} 项常规工作未完成，会保留到明天。`:'今日常规工作已完成。'}${state.overtimeOffered&&state.overtimeReply!=='deferred'?' 汇总表将回复主管明早处理。':''}</p>
-  <fieldset class="departure-options"><legend>今晚的安排</legend><label><input type="radio" name="departure" value="basketball" data-departure><span><strong>现在出门赴约</strong><small>${state.clock<'17:20'?'傍晚 18:05 出门，':''}18:30 到球场。${state.friendReply==='yes'?'会告诉阿远已经出门。':'会先联系阿远，重新确认见面。'}</small></span></label><label><input type="radio" name="departure" value="rest" data-departure><span><strong>今晚在家休息</strong><small>${state.friendReply==='no'?'今晚不再安排工作。':'会先告诉阿远今晚不去，让他不用等。'}</small></span></label></fieldset>
-  ${savePromptHTML()}<p class="tiny">取消后仍可留在电脑前，修改回复或处理文件。</p></div>`,`<footer class="modal-actions"><button class="btn" data-action="close">返回电脑</button><button class="btn primary" data-action="confirm-leave" disabled>确认安排并离开</button></footer>`,false,'logout');
+  html=modalFrame('Leave computer · My plans',`<div class="modal-body"><p class="modal-description">${state.clock<'17:20'?'Finish work for today. No more files this evening. Choose what to do next.':'That’s work done for today. What would you like to do next?'}</p><p class="tiny">${unfinished?`${unfinished} regular task${unfinished===1?'':'s'} remain unfinished and will carry over to tomorrow.`:'Today’s regular work is complete.'}${state.overtimeOffered&&state.overtimeReply!=='deferred'?' Your manager will be told you’ll handle the summary tomorrow morning.':''}</p>
+  <fieldset class="departure-options"><legend>Tonight’s plans</legend><label><input type="radio" name="departure" value="basketball" data-departure><span><strong>Head out to the game now</strong><small>Leave at 18:05 and arrive at the court at 18:30. ${state.friendReply==='yes'?'Yuan will be told you’re on your way.':'Yuan will be contacted to confirm that you’re coming after all.'}</small></span></label><label><input type="radio" name="departure" value="rest" data-departure><span><strong>Stay home and rest tonight</strong><small>${state.friendReply==='no'?'No more work planned tonight.':'Yuan will be told you can’t make it so he doesn’t wait.'}</small></span></label></fieldset>
+  ${savePromptHTML()}<p class="tiny">Cancel to stay at the computer, change your replies, or work on a file.</p></div>`,`<footer class="modal-actions"><button class="btn" data-action="close">Return to computer</button><button class="btn primary" data-action="confirm-leave" disabled>Confirm plans and leave</button></footer>`,false,'logout');
  }else if(kind==='sleep'){
-  html=modalFrame('合上电脑',`<div class="modal-body"><h3>今天就到这里。</h3><p class="modal-description">${state.activity==='overtime'?'汇总表已经提交。':state.activity==='basketball'?'球已经打完，今晚的消息还留在这里。':'今晚已经歇了歇。'}合上电脑休息，明早再打开。</p>${savePromptHTML()}</div>`,`<footer class="modal-actions"><button class="btn" data-action="close">再看一会儿</button><button class="btn primary" data-action="confirm-sleep">合上电脑</button></footer>`,false,'moon');
+  html=modalFrame('Close laptop',`<div class="modal-body"><h3>That’s it for today.</h3><p class="modal-description">${state.activity==='overtime'?'The summary has been submitted.':state.activity==='basketball'?'The game is over. Tonight’s messages are still here.':'You’ve had some time to rest tonight.'} Close the laptop and rest. Open it again tomorrow morning.</p>${savePromptHTML()}</div>`,`<footer class="modal-actions"><button class="btn" data-action="close">Stay a little longer</button><button class="btn primary" data-action="confirm-sleep">Close laptop</button></footer>`,false,'moon');
  }else if(kind==='scene'){
   const basketball=ui.modal.activity==='basketball';
-  html=modalFrame('离开电脑之后',`<div class="scene"><div class="eyebrow">周一 · ${basketball?'18:30 → 22:10':'20:30 → 21:30'}</div><h3>${basketball?'“总算来了，正好差一个。”':'吃过饭，翻了几页书。'}</h3><p>${basketball?'阿远把球抛过来。散场后，你们又聊了一会儿。':'今晚没有再打开新的工作文件。'}</p><p class="scene-quiet">${state.clock}，${basketball?'回到家':'睡前'}。阿远留了条消息。</p></div>`,`<footer class="modal-actions"><span></span><button class="btn primary" data-action="scene-continue">回到电脑，查看消息</button></footer>`,false,basketball?'ball':'moon');
+  html=modalFrame('After leaving the computer',`<div class="scene"><div class="eyebrow">Monday · ${basketball?'18:30 → 22:10':'20:30 → 21:30'}</div><h3>${basketball?'“There you are! We needed one more player.”':'After dinner, you read a few pages.'}</h3><p>${basketball?'Yuan tosses you the ball. You stay and talk for a while after the game.':'You didn’t open any more work files tonight.'}</p><p class="scene-quiet">${state.clock}, ${basketball?'Home':'Before bed'}. Yuan left a message.</p></div>`,`<footer class="modal-actions"><span></span><button class="btn primary" data-action="scene-continue">Return to the computer and check messages</button></footer>`,false,basketball?'ball':'moon');
  }else if(kind==='help'){
-  html=modalFrame('关于这台电脑',`<div class="modal-body"><h3>未保存的工作日志 · 第一幕 v0.4</h3><p class="modal-description">这是虚构的个人电脑。办公、私人聊天与个人日历彼此独立，不连接真实账号，也不会向真实的人发送消息。</p><p>阅读、切换应用和保存工作日志都不会推进时间。时间只随提交工作、确认离开或合上电脑等明确操作变化。</p><p>保存工作日志只保存已完成的工作；离开电脑时确认实际安排；当晚的行动结束后，可以合上电脑休息。</p><p class="tiny">本次体验到周二入口为止，周二的文件暂不开放。可回看昨天的消息、日历和记录。</p><p>${escapeHTML(state.migrationNotice||'')}</p><p class="help-storage">${storageBlocked?escapeHTML(loadNotice):storageAvailable?'进度自动保存在当前浏览器。原版存档独立保留。':'浏览器未允许存储，关闭页面前请留意：本次进度可能无法恢复。'}</p></div>`,`<footer class="modal-actions"><button class="btn" data-action="reset">重新开始 v0.4</button>${storageBlocked?'<button class="btn" data-action="reload">重试读取存档</button>':''}<button class="btn primary" data-action="close">返回</button></footer>`,false,'info');
+  html=modalFrame('About this computer',`<div class="modal-body"><h3>The Unsaved Work Log · Act One v0.4</h3><p class="modal-description">This is a fictional personal computer. Work, private chats, and your calendar are separate. No real accounts are connected and no messages are sent to real people.</p><p>Reading, switching apps, and saving the work log do not advance time. Time changes only when you submit work, confirm an evening activity, or end the day.</p><p>Saving the work log records completed work only. Leaving the computer confirms your evening plans. Once the evening is over, you can close the laptop and rest.</p><p class="tiny">This experience ends at Tuesday’s opening. Tuesday’s files are not available yet. You can revisit yesterday’s messages, calendar, and records.</p><p>${escapeHTML(state.migrationNotice||'')}</p><p class="help-storage">${storageBlocked?escapeHTML(loadNotice):storageAvailable?'Progress is saved in this browser. Original saves from older versions are kept separately.':'Browser storage is unavailable. Your progress may not be recoverable after you close this page.'}</p></div>`,`<footer class="modal-actions"><button class="btn" data-action="reset">Start over v0.4</button>${storageBlocked?'<button class="btn" data-action="reload">Retry loading saved progress</button>':''}<button class="btn primary" data-action="close">Back</button></footer>`,false,'info');
  }else if(kind==='receipt'){
   const task=tasks.find(t=>t.id===ui.modal.taskId);
-  html=modalFrame('工作回执',`<div class="modal-body"><span class="chip done">已完成</span><h3 style="margin-top:13px">${task.title}</h3><p class="modal-description">${task.file}</p><div class="modal-summary"><span>周一 ${task.time} 已记录</span><strong>绩效 +${task.reward}</strong></div><p class="tiny">这项工作已经记入日志，不会重复计分。</p></div>`,`<footer class="modal-actions"><span></span><button class="btn primary" data-action="close">知道了</button></footer>`);
+  html=modalFrame('Work receipt',`<div class="modal-body"><span class="chip done">Complete</span><h3 style="margin-top:13px">${task.title}</h3><p class="modal-description">${task.file}</p><div class="modal-summary"><span>Monday ${task.time} Recorded</span><strong>Performance +${task.reward}</strong></div><p class="tiny">This task is already in the log. It won’t be counted again.</p></div>`,`<footer class="modal-actions"><span></span><button class="btn primary" data-action="close">Got it</button></footer>`);
  }else if(kind==='archive'){
-  html=modalFrame('周一 · 已保存的工作日志',`<div class="modal-body review-archive" style="padding:25px 28px">${journalContent(state.savedEntries,true)}</div>`,`<footer class="modal-actions"><span class="tiny">最后保存：周一 ${state.savedWorkAt||'—'}</span><button class="btn" data-action="close">关闭</button></footer>`);
+  html=modalFrame('Monday · Saved work log',`<div class="modal-body review-archive" style="padding:25px 28px">${journalContent(state.savedEntries,true)}</div>`,`<footer class="modal-actions"><span class="tiny">Last saved: Monday  ${state.savedWorkAt||'—'}</span><button class="btn" data-action="close">Close</button></footer>`);
  }else if(kind==='reset'){
-  html=modalFrame('重新开始第一幕',`<div class="modal-body"><h3>重新回到周一早晨？</h3><p class="modal-description">这会清除本原型的本地体验进度，包括已完成的任务和对话选择。不会影响浏览器中的其他内容。</p></div>`,`<footer class="modal-actions"><span></span><div class="button-row"><button class="btn" data-action="close">保留当前进度</button><button class="btn primary" data-action="confirm-reset">重新开始</button></div></footer>`,false,'reset');
+  html=modalFrame('Restart Act One',`<div class="modal-body"><h3>Start again on Monday morning?</h3><p class="modal-description">This resets progress in this prototype, including completed tasks and conversation choices. It does not affect anything else in your browser.</p></div>`,`<footer class="modal-actions"><span></span><div class="button-row"><button class="btn" data-action="close">Keep current progress</button><button class="btn primary" data-action="confirm-reset">Start over</button></div></footer>`,false,'reset');
  }
  root.innerHTML=html;
  requestAnimationFrame(()=>{const dialog=root.querySelector('[role="dialog"]');if(dialog)dialog.focus({preventScroll:true});});
 }
-function savePromptHTML(){return state.workDirty?'<label class="checkline save-prompt"><input type="checkbox" data-save-before checked><span>同时保存当前工作日志<small>可以取消勾选；未保存草稿仍会留在这台电脑里。</small></span></label>':'<p class="tiny">当前工作日志已保存。</p>';}
+function savePromptHTML(){return state.workDirty?'<label class="checkline save-prompt"><input type="checkbox" data-save-before checked><span>Also save the current work log<small>You can uncheck this. Unsaved drafts will still remain on this computer.</small></span></label>':'<p class="tiny">The current work log is saved.</p>';}
 function syncModalControls(){
  let valid=false;
  if(ui.modal?.kind==='task')valid=ui.modal.taskId==='report'?!!(ui.checks.number&&ui.checks.note):ui.modal.taskId==='archive'?!!ui.checks.archive:true;
@@ -382,7 +383,7 @@ document.addEventListener('click',event=>{
   case 'dismiss-notice':state.migrationNotice=null;persist();break;
   case 'complete-overtime':finishOvertime();break;
     case 'scene-continue':goApp('personal');break;
-  case 'save':if(state.stage!=='tuesday'){saveWork();persist();render();toast('工作日志已保存。');}break;
+  case 'save':if(state.stage!=='tuesday'){saveWork();persist();render();toast('Work log saved.');}break;
   case 'archive':openModal('archive');break;
   case 'reset':openModal('reset');break;
   case 'confirm-reset':resetExperience();break;
