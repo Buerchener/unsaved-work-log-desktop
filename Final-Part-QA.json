@@ -1,0 +1,20 @@
+{
+  "base": "http://127.0.0.1:8879/",
+  "checks": [
+    "Part I report checks and submission",
+    "Five deadline notes; keyboard movement and attachment links",
+    "Final notes save and reload independently",
+    "100 reached; target raised to 120",
+    "Manager notification and reply",
+    "Archived friend conversation and weekend notes",
+    "Disabled personal apps open managed-device explanation",
+    "File browser opens actual work attachments",
+    "Maximize, restore, drag, minimize, taskbar restore, close",
+    "Shutdown loop; Part I save is byte-for-byte unchanged",
+    "Final restart and persistence are isolated",
+    "Return to Part I resumes original progress",
+    "Part I full regular workday still reaches 20/20 and friend invitation",
+    "390px touch view: submit and shutdown loop"
+  ],
+  "errors": []
+}

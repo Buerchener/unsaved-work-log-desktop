@@ -21,3 +21,15 @@
 存档保存在当前浏览器、当前打开地址下。直接打开文件与本地服务器使用不同的存储来源，进度不自动互通。v0.4 与 v0.3 / v1 的存档键独立，旧键不会因升级删除；迁移说明可在帮助中查看。音乐必须主动点击播放。
 
 原始 ZIP 和旧版本回退包保留在项目上级目录。只覆盖工作目录内的相关工程，不改动其他作业资料。
+
+## Final Part — Work Machine (2026-09-27)
+
+- Part I: `index.html` (original storyline and save retained).
+- Final Part: `final.html`; select the chapter link at the top of either desktop.
+- Restart only the final demonstration: `final.html?restart=1`, or the ↻ link.
+- Suggested 60-second demo: inspect the packed desktop and deadline notes; open Work Log; check the final revision and submit (99/100 → 100/120); open Workspace or the personal archive; select Shut down in the log or Start menu; the same desktop returns at 09:00 with a 120 target.
+- 60 clickable work attachments, five movable/clickable deadline sticky notes, performance history, work calendar, archived Yuan chat and weekend notes, and unavailable personal applications.
+- Visual direction follows the latest user correction: normal full-colour Windows UI, with crowding and work content expressing the change. The original wallpaper is replaced by an AI-generated photograph of the protagonist’s own overcrowded desk: coffee, waste paper, report piles, a Performance Star trophy, wall-to-wall deadlines and photos with fictional executives. No desaturation, horror effect or jump scare.
+- The final scene reuses the original window manager and icon assets. Final-specific views are in `final.js`, styles in `final.css`, chapter links in `chapters.css`.
+- Part I storage: `unsaved-work-log.act1.v4`. Final Part storage: `unsaved-work-log.final.v1`. Final progression and work-note drafts survive reloads; the restart link resets Final Part only. Deadline sticker positions are session-only. The final scene intentionally stops at the restored workday rather than implementing intermediate chapters or another full workday.
+- Keyboard: Enter opens focused shortcuts; window resize handle and deadline-note headers support arrow keys. On touch screens, tap a shortcut to open it.

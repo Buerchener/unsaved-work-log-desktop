@@ -63,3 +63,11 @@ v0.4 使用独立 localStorage 键，优先读取本版，再兼容 v0.3 与 v1�
 9. 响应：小于 1000px 任务栏应用组靠左避让托盘；小于 700px 前景单窗，任务栏可横向滚动，开始菜单四列。
 
 相册三张图片由内置 imagegen 生成，为虚构生活照片；不再使用原手绘 SVG 相册图。默认桌面背景为 Microsoft 官方 Bloom 浅色，另含深色与 Surface Hub 蓝紫背景，来源见 assets/ASSET_SOURCES.md。
+
+## Final Part / 2026-09-27 (separate chapter)
+
+The user explicitly authorized a final chapter and a restrained loop ending. This supersedes the earlier first-act-only limitation for `final.html`, while preserving all Part I rules.
+
+Latest visual direction: do not communicate emotion through a desaturated palette. Keep the original desktop and icon colours; communicate occupation through 60 repeating work files, five deadline sticky notes, and an AI-generated personal office-desk photograph replacing the personal wallpaper, with file piles, coffee, paper waste, a Performance Star award, deadlines and executive photos. Notes move by dragging their headers or using arrow keys; their bodies link to actual work windows.
+
+Retain native desktop framing and controls. No new marketing-page shell. A small chapter switch provides direct comparison and independent restart. Escalation is 99/100 to 100/120. Shutdown fades quietly, shows 09:00 and restores the work log. Personal traces remain in an archived conversation and notes; no new personal notifications are generated. Save keys are independent.

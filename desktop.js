@@ -7,6 +7,7 @@ const Desktop=(()=>{
   files:{name:'My files',symbol:'folder',color:'amber',w:760,h:560},games:{name:'Games',symbol:'game',color:'violet',w:690,h:590},
   music:{name:'Music',symbol:'music',color:'rose',w:620,h:470},photos:{name:'Photos',symbol:'photo',color:'teal',w:760,h:590},notes:{name:'Notes',symbol:'note',color:'yellow',w:560,h:470}
  };
+ if(window.FinalPart){for(const id of Object.keys(apps))delete apps[id];Object.assign(apps,FinalPart.apps);}
  icons.search='<circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/>';
  icons.game='<path d="M7 7h10c3 0 5 10 3 12-2 2-4-3-5-3H9c-1 0-3 5-5 3C2 17 4 7 7 7Z"/><path d="M8 10v5m-2-2h4M16 11h.01M18 14h.01"/>';
  icons.music='<path d="M9 18V5l11-2v13M9 8l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/>';
@@ -22,7 +23,7 @@ const Desktop=(()=>{
  function comp(){return state.computer;}
  function win(id){return comp().windows.find(w=>w.id===id);}
  function badge(id){return id==='office'?unread('work'):id==='chat'?unread('personal'):0;}
- function appIcon(id){return WinShell.appIcon(id);}
+ function appIcon(id){return WinShell.appIcon(window.FinalPart?FinalPart.iconFor(id):id);}
  function bounds(w){const mobile=innerWidth<700,aw=innerWidth,ah=innerHeight-48;
   if(mobile){return {x:6,y:8,w:aw-12,h:ah-16};}
   if(w.max)return {x:0,y:0,w:aw,h:ah};
@@ -30,10 +31,10 @@ const Desktop=(()=>{
   w.x=Math.max(0,Math.min(w.x,aw-w.w));w.y=Math.max(0,Math.min(w.y,ah-w.h));return w;
  }
  function applyWindow(w){const el=document.querySelector(`[data-window="${w.id}"]`);if(!el)return;const r=bounds(w);el.style.left=r.x+'px';el.style.top=r.y+'px';el.style.width=r.w+'px';el.style.height=r.h+'px';el.style.zIndex=w.z;el.hidden=w.min;el.classList.toggle('foreground',comp().front===w.id);el.classList.toggle('maximized',w.max);if(innerWidth<700)el.hidden=w.min||comp().front!==w.id;const b=el.querySelector('[data-wm="maximize"]');b.innerHTML=icon(w.max?'restore':'maximize');b.setAttribute('aria-label',w.max?'Restore window':'Maximize window');}
- function focus(id,keyboard=false){const w=win(id);if(!w)return;hideEntry();w.min=false;w.z=++comp().z;comp().front=id;for(const item of comp().windows)applyWindow(item);chrome();persist();if(keyboard)document.querySelector(`[data-window="${id}"] .window-titlebar`).focus({preventScroll:true});requestAnimationFrame(readVisible);}
- function create(id,app,data={}){let w=win(id);if(w){focus(id);return w;}const a=apps[app]||{w:860,h:630};const n=comp().windows.length;w={id,app,x:150+(n%5)*34,y:64+(n%5)*27,w:a.w,h:a.h,z:++comp().z,min:false,max:false,data};comp().windows.push(w);mount(w);focus(id,true);return w;}
+ function focus(id,keyboard=false){const w=win(id);if(!w)return;if(window.FinalPart)FinalPart.onFocus(id);hideEntry();w.min=false;w.z=++comp().z;comp().front=id;for(const item of comp().windows)applyWindow(item);chrome();persist();if(keyboard)document.querySelector(`[data-window="${id}"] .window-titlebar`).focus({preventScroll:true});requestAnimationFrame(readVisible);}
+ function create(id,app,data={}){let w=win(id);if(w){focus(id);return w;}const a=apps[app]||{w:860,h:630};const n=comp().windows.length;w={id,app,x:150+(n%5)*34,y:64+(n%5)*27,w:a.w,h:a.h,z:++comp().z,min:false,max:false,data};if(window.FinalPart)FinalPart.place(w);comp().windows.push(w);mount(w);focus(id,true);return w;}
  function mount(w){const el=document.createElement('section');el.className='app-window';el.dataset.window=w.id;el.dataset.app=w.app;el.setAttribute('aria-label',title(w));el.innerHTML=`<header class="window-titlebar" tabindex="-1">${appIcon(w.app)}<span class="window-name">${escapeHTML(title(w))}</span><div class="window-controls"><button data-wm="minimize" aria-label="Minimize window">${icon('minimize')}</button><button data-wm="maximize" aria-label="Maximize window">${icon('maximize')}</button><button data-wm="close" aria-label="Close window">${icon('close')}</button></div></header><div class="window-content app-surface"></div><button class="resize-handle" data-wm="resize" aria-label="Resize window (arrow keys for small adjustments)"></button>`;document.getElementById('windows').append(el);renderWindow(w);applyWindow(w);}
- function title(w){return w.app==='document'?(w.data.task==='overtime'?'Morning summary.xlsx':tasks.find(t=>t.id===w.data.task)?.file||'Documents'):apps[w.app].name;}
+ function title(w){if(window.FinalPart)return FinalPart.title(w);return w.app==='document'?(w.data.task==='overtime'?'Morning summary.xlsx':tasks.find(t=>t.id===w.data.task)?.file||'Documents'):apps[w.app].name;}
  function openApp(id){if(!apps[id])return;const w=create(id,id);if(id==='email')w.data.task='email';renderWindow(w);focus(id,true);if(id==='chat'||id==='office')scrollChat(id);}
  function openDocument(id){
   const t=tasks.find(t=>t.id===id);if(!t&&id!=='overtime')return;
@@ -66,6 +67,7 @@ const Desktop=(()=>{
  }
  function renderWindow(w){
   const content=document.querySelector(`[data-window="${w.id}"] .window-content`);if(!content)return;
+  if(window.FinalPart){content.innerHTML=FinalPart.view(w);return;}
   const priorStream=content.querySelector('.chat-stream');const previousScroll=priorStream?.scrollTop??0;const bottom=!priorStream||priorStream.scrollHeight-priorStream.clientHeight-previousScroll<55;const priorFocus=document.activeElement;const focusId=content.contains(priorFocus)?priorFocus.getAttribute('data-focus'):null;
   let html='';if(w.app==='office'){
    const previous=ui.app;ui.app=comp().officeTab;
@@ -90,6 +92,7 @@ const Desktop=(()=>{
  function contactButtons(){return `<div class="contact-label">Messages</div><button class="contact ${comp().conversation==='ayuan'?'selected':''}" data-desktop="contact" data-contact="ayuan"><span class="avatar friend">Y</span><span>Yuan${unread('personal')?`<b class="unread-number">${unread('personal')}</b>`:''}</span></button><button class="contact ${comp().conversation==='lin'?'selected':''}" data-desktop="contact" data-contact="lin"><span class="avatar">L</span><span>Lin</span></button>`;}
  function refreshStory(){for(const w of comp().windows)if(['office','chat','document','email','calendar'].includes(w.app))renderWindow(w);chrome();scheduleNotifications();}
  function chrome(){
+  if(window.FinalPart){FinalPart.chrome();return;}
   const shortcuts=document.getElementById('shortcuts');if(!shortcuts.children.length)shortcuts.innerHTML=Object.entries(apps).filter(([id])=>id!=='settings').map(([id,a])=>`<button class="desktop-shortcut" data-launch="${id}" aria-label="${a.name}" title="Double-click to open  ${a.name}">${appIcon(id)}<span>${a.name}</span><b class="shortcut-badge" hidden></b></button>`).join('');
   for(const el of shortcuts.children){const n=badge(el.dataset.launch),b=el.querySelector('b');b.hidden=!n;b.textContent=n;}
   document.getElementById('desktop').style.backgroundImage=`url('assets/wallpapers/${WinShell.wallpapers.some(x=>x.file===comp().wallpaper)?comp().wallpaper:'bloom-light.jpg'}')`;
@@ -138,6 +141,7 @@ const Desktop=(()=>{
   document.getElementById('desktop').append(el);
  }
  function init(){
+  if(window.FinalPart){state.computer={...defaults(),windows:[],front:null};FinalPart.init();return;}
   // Apply the new default once to old saves; later mute choices stay saved.
   if(state.computer&&state.computer.soundDefaultVersion!==1){state.computer.sound=true;state.computer.soundDefaultVersion=1;}
   state.computer={...defaults(),...(state.computer||{})};state.computer.windows=state.computer.windows.filter(w=>apps[w.app]||w.app==='document');
@@ -181,7 +185,7 @@ const Desktop=(()=>{
  document.addEventListener('pointermove',e=>{if(!drag)return;const w=win(drag.id);if(drag.resize){w.w=drag.ow+e.clientX-drag.x;w.h=drag.oh+e.clientY-drag.y;}else{w.x=drag.ox+e.clientX-drag.x;w.y=drag.oy+e.clientY-drag.y;}applyWindow(w);});
  document.addEventListener('pointerup',()=>{if(drag){drag=null;persist();}});
  document.addEventListener('input',e=>{if(e.target.matches('.note-editor')){comp().noteDraft=e.target.value;const status=document.querySelector(".note-status");if(status)status.textContent="Draft kept on this computer, not yet saved";persist();}});
- addEventListener('resize',()=>{for(const w of comp().windows)applyWindow(w);persist();});
+ addEventListener('resize',()=>{for(const w of comp().windows)applyWindow(w);if(window.FinalPart)chrome();persist();});
  addEventListener('visibilitychange',readVisible);
  return {init,newGame,refreshStory,apps,openApp,openDocument,clearWindows,scrollChat,readVisible,scheduleNotifications,taskChecks,taskNotify,hasTask,checkChanged,notifyChanged,renderWindow,win,comp,appIcon,focus,showDesktop,chrome};
 })();

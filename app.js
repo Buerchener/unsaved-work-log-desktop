@@ -2,7 +2,8 @@
 'use strict';
 // First-act adaptation. Source rules: visible Performance, hidden Self/Life.
 // Replying changes plans only; actual activities apply stat changes once.
-const STORAGE_KEY = 'unsaved-work-log.act1.v4';
+const FINAL_PART = document.documentElement.dataset.part === 'final';
+const STORAGE_KEY = FINAL_PART ? 'unsaved-work-log.final.v1' : 'unsaved-work-log.act1.v4';
 const PREVIOUS_KEY = 'unsaved-work-log.act1.v3';
 const LEGACY_KEY = 'unsaved-work-log.act1.v1';
 const icons = {
@@ -51,7 +52,7 @@ let storageAvailable=true,storageBlocked=false,loadNotice='';
 let state=freshState();
 function validSave(p){return p&&[1,3,4].includes(p.version)&&['day','evening','night','tuesday'].includes(p.stage)&&Array.isArray(p.completed)&&new Set(p.completed).size===p.completed.length&&p.completed.every(id=>tasks.some(t=>t.id===id))&&Array.isArray(p.events)&&Array.isArray(p.workMessages)&&Array.isArray(p.privateMessages)&&Array.isArray(p.savedEntries)&&p.read&&Number.isFinite(p.life)&&Number.isFinite(p.performance);}
 try{
- const current=localStorage.getItem(STORAGE_KEY),legacy=current?null:(localStorage.getItem(PREVIOUS_KEY)||localStorage.getItem(LEGACY_KEY));
+ const current=localStorage.getItem(STORAGE_KEY),legacy=(current||FINAL_PART)?null:(localStorage.getItem(PREVIOUS_KEY)||localStorage.getItem(LEGACY_KEY));
  if(current||legacy){
   const parsed=JSON.parse(current||legacy);
   if(!validSave(parsed))throw new Error('unsupported save');
