@@ -19,7 +19,7 @@ const Desktop=(()=>{
  icons.minimize='<path d="M5 16h14"/>';
  icons.restore='<path d="M8 8V4h12v12h-4"/><rect x="4" y="8" width="12" height="12" rx="1"/>';
  let activeBanners=new Map(),notificationJob=null,introTimer=null,observer=null,drag=null,selected=null;
- const defaults=()=>({wallpaper:'bloom-light.jpg',windows:[],front:null,z:10,officeTab:'work',conversation:'ayuan',sound:true,soundDefaultVersion:1,notes:'Things to do this weekend\n\nRepot the plant.\nFinish the sketch of the lake.\nFinish reading Invisible Cities.\n\nYuan says the lights at the new court are good. Let’s try it next time.',noteDraft:null,album:0,folder:'home',game:{cards:['leaf','ball','moon','music','ball','leaf','music','moon'],open:[],matched:[],moves:0},track:0});
+ const defaults=()=>({wallpaper:'personal-desk.png',personalWallpaperVersion:1,windows:[],front:null,z:10,officeTab:'work',conversation:'ayuan',sound:true,soundDefaultVersion:1,notes:'Things to do this weekend\n\nRepot the plant.\nFinish the sketch of the lake.\nFinish reading Invisible Cities.\n\nYuan says the lights at the new court are good. Let’s try it next time.',noteDraft:null,album:0,folder:'home',game:{cards:['leaf','ball','moon','music','ball','leaf','music','moon'],open:[],matched:[],moves:0},track:0});
  function comp(){return state.computer;}
  function win(id){return comp().windows.find(w=>w.id===id);}
  function badge(id){return id==='office'?unread('work'):id==='chat'?unread('personal'):0;}
@@ -95,7 +95,7 @@ const Desktop=(()=>{
   if(window.FinalPart){FinalPart.chrome();return;}
   const shortcuts=document.getElementById('shortcuts');if(!shortcuts.children.length)shortcuts.innerHTML=Object.entries(apps).filter(([id])=>id!=='settings').map(([id,a])=>`<button class="desktop-shortcut" data-launch="${id}" aria-label="${a.name}" title="Double-click to open  ${a.name}">${appIcon(id)}<span>${a.name}</span><b class="shortcut-badge" hidden></b></button>`).join('');
   for(const el of shortcuts.children){const n=badge(el.dataset.launch),b=el.querySelector('b');b.hidden=!n;b.textContent=n;}
-  document.getElementById('desktop').style.backgroundImage=`url('assets/wallpapers/${WinShell.wallpapers.some(x=>x.file===comp().wallpaper)?comp().wallpaper:'bloom-light.jpg'}')`;
+  document.getElementById('desktop').style.backgroundImage=`url('assets/wallpapers/${WinShell.wallpapers.some(x=>x.file===comp().wallpaper)?comp().wallpaper:'personal-desk.png'}')`;
   shortcuts.style.gridTemplateRows=`repeat(${Math.max(3,Math.floor((innerHeight-65)/96))},90px)`;
   const taskbar=document.getElementById('taskbar');taskbar.innerHTML=`<div class="taskbar-center"><button class="taskbar-system start-button" data-desktop="menu" aria-label="Start" title="Start">${WinShell.logo()}</button><button class="taskbar-system" data-desktop="search" aria-label="Search apps" title="Search">${icon('search')}</button><div class="taskbar-apps">${Object.entries(apps).filter(([id])=>id!=='settings'||win(id)).map(([id,a])=>`<button class="taskbar-app ${win(id)?'running':''} ${comp().front===id?'selected':''}" data-taskbar="${id}" aria-label="${a.name}" title="${a.name}">${appIcon(id)}${badge(id)?`<b>${badge(id)}</b>`:''}</button>`).join('')}${comp().windows.filter(w=>w.app==='document').map(w=>`<button class="taskbar-app running ${comp().front===w.id?'selected':''}" data-taskbar="${w.id}" title="${escapeHTML(title(w))}" aria-label="${escapeHTML(title(w))}">${appIcon('document')}</button>`).join('')}</div></div><div class="system-tray"><span class="input-language" title="English input">EN</span><button class="tray-quick" data-desktop="quick-settings" aria-label="Quick settings">${WinShell.wifi()}${icon('volume')}<span class="battery-icon" aria-hidden="true"></span></button><button class="tray-date" data-desktop="notifications" aria-label="Notification center"><span class="desktop-clock"><strong>${state.clock}</strong><small>${state.stage==='tuesday'?'Tuesday':'Monday'}</small></span>${icon('bell')}${unread('work')+unread('personal')?'<i></i>':''}</button><button class="show-desktop-edge" data-desktop="show-desktop" aria-label="Show desktop" title="Show desktop"></button></div>`;
   const contact=document.querySelector('[data-contact="ayuan"] .unread-number');if(contact){contact.textContent=unread("personal");contact.hidden=!unread("personal");}
@@ -142,6 +142,11 @@ const Desktop=(()=>{
  }
  function init(){
   if(window.FinalPart){state.computer={...defaults(),windows:[],front:null};FinalPart.init();return;}
+  // Update the former default once while preserving custom wallpapers and all progress.
+  if(state.computer&&!state.computer.personalWallpaperVersion){
+   if(state.computer.wallpaper==='bloom-light.jpg')state.computer.wallpaper='personal-desk.png';
+   state.computer.personalWallpaperVersion=1;
+  }
   // Apply the new default once to old saves; later mute choices stay saved.
   if(state.computer&&state.computer.soundDefaultVersion!==1){state.computer.sound=true;state.computer.soundDefaultVersion=1;}
   state.computer={...defaults(),...(state.computer||{})};state.computer.windows=state.computer.windows.filter(w=>apps[w.app]||w.app==='document');

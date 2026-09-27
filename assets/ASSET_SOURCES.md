@@ -52,3 +52,9 @@ Use case: photorealistic-natural. Generate one landscape 3:2 photograph, a quiet
 ## Final Part performance wallpaper (2026-09-27)
 
 `wallpapers/work-desk-performance-star.png`: generated with the built-in OpenAI image_gen tool for this project, in response to the user's explicit request for an AI-generated photo of the protagonist’s own crowded workstation, with coffee, waste paper, a Performance Star trophy, deadlines and photos with executives. All pictured people and corporate settings are fictional. The original generated image is included without image editing. Full prompt: `wallpapers/work-desk-performance-star.prompt.md`. The desktop icons and deadline notes are separate interactive elements, not baked into the image.
+
+## Part I personal-desk wallpaper (2026-09-27)
+
+`wallpapers/personal-desk.png`: generated using the built-in image_gen tool at the user's request. Clean personal desk, tidy documents, sports water bottle, family and travel photographs. All people are fictional. Normal daylight and natural colours; contrast with Final Part is based on objects and occupation, not colour grading. Full prompt: `wallpapers/personal-desk.prompt.md`.
+
+This is now the Part I default, replacing Bloom Light. Existing saves using the former default update once; explicitly selected Bloom Dark or Surface Hub wallpapers remain unchanged. Original wallpapers remain available in Personalization.

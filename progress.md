@@ -14,3 +14,7 @@ Original prompt: Preserve Part 1 of The Unsaved Work Log, implement a directly d
 - Final visual QA inspected desktop, log, manager, archived notes, loop and mobile screenshots. Notifications reposition within the window body to avoid action/titlebar controls; chapter links hide while a phone-sized window is open (Show desktop restores them).
 - Latest user direction supersedes the meeting-room campaign wallpaper: generated and integrated the protagonist’s own crowded work desk, coffee, paper waste, Performance Star trophy, wall deadlines and photos with fictional leaders. Normal colour retained. Removed only the unused, uncommitted earlier generated variant.
 - Final code regression: all 14 scenario groups passed again, with no browser errors.
+- Deployment cache guard: versioned shared script/style URLs in both chapter entries, so a browser retaining the old Part I app.js cannot load Final Part with the old storage key.
+- User additionally requested a contrasting Part I wallpaper. Generated a clean personal desk with family/travel photos, neat documents and a sports bottle; added it as default and a selectable background. One-time migration touches only the previous default wallpaper, retaining story progress and custom selections.
+- Updated release resource identifiers to final3 for consistent cached-client upgrades.
+- Paired-wallpaper QA passed: all 14 interaction groups again, plus old-default wallpaper migration, custom-background preservation and personal-note preservation. Both desktop wallpapers inspected in rendered browser screenshots.

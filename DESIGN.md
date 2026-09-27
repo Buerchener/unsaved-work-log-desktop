@@ -71,3 +71,7 @@ The user explicitly authorized a final chapter and a restrained loop ending. Thi
 Latest visual direction: do not communicate emotion through a desaturated palette. Keep the original desktop and icon colours; communicate occupation through 60 repeating work files, five deadline sticky notes, and an AI-generated personal office-desk photograph replacing the personal wallpaper, with file piles, coffee, paper waste, a Performance Star award, deadlines and executive photos. Notes move by dragging their headers or using arrow keys; their bodies link to actual work windows.
 
 Retain native desktop framing and controls. No new marketing-page shell. A small chapter switch provides direct comparison and independent restart. Escalation is 99/100 to 100/120. Shutdown fades quietly, shows 09:00 and restores the work log. Personal traces remain in an archived conversation and notes; no new personal notifications are generated. Save keys are independent.
+
+### Part I paired wallpaper (latest user request)
+
+The default Part I wallpaper is now a clean personal desk with family/travel photographs, tidy papers and a sports water bottle. It deliberately contrasts with the Final Part desk while keeping natural colours in both. Previous default-wallpaper saves migrate once without resetting their story, documents or notes; custom backgrounds remain available and preserved.

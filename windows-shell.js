@@ -1,6 +1,6 @@
 'use strict';
 const WinShell=(()=>{
- const wallpapers=[{file:'bloom-light.jpg',name:'Windows 11 · Bloom Light'},{file:'bloom-dark.jpg',name:'Windows 11 · Bloom Dark'},{file:'bloom-hub.png',name:'Surface Hub · Blue-violet waves'}];
+ const wallpapers=[{file:'personal-desk.png',name:'My desk · Personal memories'},{file:'bloom-light.jpg',name:'Windows 11 · Bloom Light'},{file:'bloom-dark.jpg',name:'Windows 11 · Bloom Dark'},{file:'bloom-hub.png',name:'Surface Hub · Blue-violet waves'}];
  const designs={
  office:'<path fill="#267bdd" d="M5 6h23v27H5z"/><path fill="#57b9fb" d="m20 3 15 7v22l-15 5z"/><path fill="#fff" d="m10 15 5 5 13-10v7L15 27l-5-6z"/>',
  chat:'<path fill="#28b86b" d="M3 6h28v21H15l-8 7v-7H3z"/><path fill="#a1efb6" d="M19 14h17v17h-5l-1 5-6-5h-5z"/><circle fill="#fff" cx="10" cy="17" r="2"/><circle fill="#fff" cx="17" cy="17" r="2"/>',
